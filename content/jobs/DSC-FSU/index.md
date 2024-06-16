@@ -1,5 +1,5 @@
 ---
-date: '2022-08-22'
+date: '2'
 title: 'Graduate Research Assistant'
 company: 'D.S.C at F.S.U'
 location: 'Tallahassee, FL'
