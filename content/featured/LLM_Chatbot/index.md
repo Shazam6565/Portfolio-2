@@ -3,7 +3,7 @@ date: '1'
 title: 'LLM Powered personalized Chatbot'
 cover: './langchain.webp'
 github: 'https://github.com/Shazam6565/Shazam-GPT'
-external: 'https://www.newline.co/courses/build-a-spotify-connected-app'
+external: 'https://shauryatiwari.com/archive/'
 cta: '/#chat'
 tech:
   - RAG

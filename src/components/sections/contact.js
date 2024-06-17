@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { srConfig, email } from '@config';
+import { srConfig } from '@config';
 import sr from '@utils/sr';
 import { usePrefersReducedMotion } from '@hooks';
 
@@ -60,13 +60,18 @@ const Contact = () => {
       <h2 className="title">Get In Touch</h2>
 
       <p>
-        Looking forward to discussing potential opportunities or answering any inquiries. 
-        Whether you have a question or just want to say hi, I’ll try my best to get back to you. Get in touch today!
+        Looking forward to discussing potential opportunities or answering any inquiries. Whether
+        you have a question or just want to say hi, I’ll try my best to get back to you. Get in
+        touch via mail at <a href="mailto:vaasutiwari@gmail.com">vaasutiwari@gmail.com</a>!
       </p>
 
-      <a className="email-link" href="https://calendly.com/vaasutiwari" target="_blank" rel="noopener noreferrer">
-      Schedule a meeting with me
-    </a>
+      <a
+        className="email-link"
+        href="https://calendly.com/vaasutiwari"
+        target="_blank"
+        rel="noopener noreferrer">
+        Schedule a meeting with me
+      </a>
     </StyledContactSection>
   );
 };
