@@ -3,8 +3,6 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { navDelay, loaderDelay } from '@utils';
 import { usePrefersReducedMotion } from '@hooks';
-import Chatbot from '../chatbot'; // Import the Chatbot component
-
 
 const StyledHeroSection = styled.section`
   ${({ theme }) => theme.mixins.flexCenter};
@@ -12,8 +10,8 @@ const StyledHeroSection = styled.section`
   align-items: flex-start;
   min-height: 120vh;
   height: 100vh;
-  padding: 0 ;
-  box-sizing: border-box;  /* Include padding and border in the element's total width and height */
+  padding: 0;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 
   @media (max-height: 700px) and (min-width: 700px), (max-width: 360px) {
     height: auto;
@@ -64,11 +62,14 @@ const Hero = () => {
 
   const one = <h1>Hi, my name is</h1>;
   const two = <h2 className="big-heading">Shaurya Tiwari</h2>;
-  const three = <h3 className="big-heading">I turn expectations into solutions .</h3>;
+  const three = <h3 className="big-heading">I believe in creating value by solving problems.</h3>;
   const four = (
     <>
       <p>
-      Over the past six years, I have pursued a Bachelor's in Information Technology and recently completed my Master's in Computer Science from Florida State University, complemented by over three years of hands-on experience through internships and part-time roles in software consultancy, data products and research departments.
+        Over the past six years, I have pursued a Bachelor's in Information Technology and recently
+        completed my Master's in Computer Science from Florida State University, complemented by
+        over three years of hands-on experience through internships and part-time roles in software
+        consultancy, data products and research departments.
       </p>
     </>
   );
