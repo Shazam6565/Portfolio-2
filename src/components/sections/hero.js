@@ -60,26 +60,17 @@ const Hero = () => {
     return () => clearTimeout(timeout);
   }, []);
 
-  const one = <h1>Hi, my name is</h1>;
+  const one = <h1>Mid - level A.I. Software Engineer</h1>;
   const two = <h2 className="big-heading">Shaurya Tiwari</h2>;
-  const three = <h3 className="big-heading">I believe in creating value by solving problems.</h3>;
+  const three = <h3 className="big-heading">From customer problems to production system.</h3>;
   const four = (
     <>
-      <p>
-        Over the past six years, I have pursued a Bachelor's in Information Technology and recently
-        completed my Master's in Computer Science from Florida State University, complemented by
-        over three years of hands-on experience through internships and part-time roles in software
-        consultancy, data products and research departments.
-      </p>
+      <p>Forward-deployed AI • Backend systems • Data platforms</p>
     </>
   );
   const five = (
-    <a
-      className="email-link"
-      href="https://www.linkedin.com/in/shauryatiwari/"
-      target="_blank"
-      rel="noreferrer">
-      Connect with me on LinkedIN!
+    <a className="email-link" href="/chat" target="_blank" rel="noreferrer">
+      Chat with my AI here!
     </a>
   );
 

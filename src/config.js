@@ -45,7 +45,10 @@ module.exports = {
       name: 'Contact',
       url: '/#contact',
     },
-    
+    {
+      name: 'Consciousness',
+      url: '/chat',
+    },
   ],
 
   colors: {

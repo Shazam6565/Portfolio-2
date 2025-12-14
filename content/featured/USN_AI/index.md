@@ -1,10 +1,10 @@
 ---
 date: '1'
-title: 'LLM Powered personalized Chatbot'
-cover: './rag.png'
-github: 'https://github.com/Shazam6565/Shazam-GPT'
-external: '/chat'
-cta: '/chat'
+title: 'Academic Insights AI Assistant'
+cover: './aiimage.png'
+github: 'https://www.law.cornell.edu/wex/non-disclosure_agreement_(nda)'
+external: 'https://ai.usnews.com/'
+cta: 'https://ai.usnews.com/features?'
 tech:
   - RAG
   - Langchain
