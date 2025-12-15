@@ -160,10 +160,7 @@ const ChatSection = () => {
 
     try {
       // Connect to Backend API
-      const API_URL =
-        process.env.NODE_ENV === 'production'
-          ? 'https://portfolio-2-2-mvzp.onrender.com/chat'
-          : 'http://127.0.0.1:8000/chat';
+      const API_URL = 'https://shaurya-chat-endpoint.onrender.com/chat';
 
       const response = await axios.post(API_URL, {
         message: userMsg.content,
