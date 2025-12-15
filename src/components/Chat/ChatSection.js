@@ -149,7 +149,9 @@ const ChatSection = () => {
 
   const handleSend = async e => {
     e.preventDefault();
-    if (!input.trim() || loading) {return;}
+    if (!input.trim() || loading) {
+      return;
+    }
 
     const userMsg = { role: 'user', content: input };
     setMessages(prev => [...prev, userMsg]);
@@ -158,7 +160,12 @@ const ChatSection = () => {
 
     try {
       // Connect to Backend API
-      const response = await axios.post('http://127.0.0.1:8000/chat', {
+      const API_URL =
+        process.env.NODE_ENV === 'production'
+          ? 'https://portfolio-2-2-mvzp.onrender.com/chat'
+          : 'http://127.0.0.1:8000/chat';
+
+      const response = await axios.post(API_URL, {
         message: userMsg.content,
       });
 
