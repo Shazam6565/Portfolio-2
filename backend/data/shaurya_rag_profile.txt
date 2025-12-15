@@ -1,0 +1,244 @@
+SHAURYA TIWARI — PERSONAL KNOWLEDGE FILE FOR RAG
+Version: 2025-12-14
+Purpose: Retrieval-optimized profile document for ChromaDB (vector store) ingestion.
+Usage: This document is designed to answer questions about Shaurya’s background, experience, skills, projects, and interests.
+Notes on layout: Short paragraphs, dense keywords, explicit aliases, and many “Q:”/“A:” entries to improve retrieval recall.
+
+================================================================================
+IDENTITY (PRIMARY)
+================================================================================
+Full name: Shaurya Tiwari
+Preferred name / alias: Batman
+Current location: New York, NY (USA)
+Email: vaasutiwari@gmail.com
+Phone: +1 (850) 345 4636
+Website: https://shauryatiwari.com
+LinkedIn: https://linkedin.com/in/shauryatiwari/
+GitHub: https://github.com/Shazam6565
+YouTube: https://youtube.com/@shauryatiwari2500/streams
+
+Professional tagline keywords:
+AI Software Engineer • Forward-Deployed Engineering mindset • AI Platforms • Agentic Systems
+Django • Python • LangChain • LangGraph • OpenSearch • Vector Search • RAG • Streaming APIs
+Production reliability • Deterministic ranking • Tool orchestration • Data-intensive systems
+
+================================================================================
+ONE-PARAGRAPH SUMMARY (FOR “ABOUT ME”)
+================================================================================
+Shaurya Tiwari is an AI Software Engineer focused on building and deploying production AI systems that are reliable, deterministic, and data-grounded. He builds AI platforms and agentic workflows with LangChain/LangGraph, integrates vector search (OpenSearch/FAISS), and ships low-latency streaming APIs in Django-based backends. He has delivered systems across research, data engineering, DevOps, and customer-facing products, and is especially strong at turning ambiguous requirements into working systems under real operational constraints.
+
+================================================================================
+CURRENT ROLE (MOST IMPORTANT FOR EMPLOYERS)
+================================================================================
+Company: U.S. News & World Report
+Title: AI Software Engineer
+Dates: Aug 2024 – Present
+Location: New York, NY
+
+What Shaurya does (high-level):
+- Builds and maintains ByteSage, a Django backend platform for AI-powered products.
+- Designs agentic workflows with LangChain + LangGraph (ReAct-style loop with tools).
+- Integrates vector stores and retrieval for structured and unstructured content.
+- Ships streaming responses for real-time AI UX.
+- Hardens production code paths across environments (local, sandbox, UAT).
+- Collaborates cross-functionally (product, infra, data) for customer-facing AI features.
+
+Key systems / technical themes:
+- Agent workflows: conditional routing, tool orchestration, guardrails, deterministic lanes.
+- Retrieval: OpenSearch vector indices, FAISS page-specific stores, metadata filtering.
+- Streaming: Django StreamingHttpResponse, token streaming protocols.
+- API tools: constructing calls to Academic Insights API endpoints, shaping outputs.
+- Reliability: environment debugging, CI/CD (Jenkins), deployment hygiene.
+
+Concrete “ByteSage / Academic Insights” details (keywords for retrieval):
+- ByteSage: Django backend for AI-powered apps (site search + Academic Insights AI assistant backend).
+- LangGraph: ReAct-style agent loop, conditional continuation, tool invocation.
+- convert_to_openai_messages(): maps frontend messages and experimental_attachments to OpenAI schema.
+- stream_text(): streams LangGraph output using custom protocol prefixes (e.g., 0:, 9:, a:, e:).
+- VectorStore.get_store(): lazy-loads OpenSearchVectorSearch; creates index if missing; caches store.
+- OpenSearch migration: transitioning from Postgres grouped vector store to separate OpenSearch indices.
+- Deterministic ranking work: metrics registry + router + server-side sorted facts endpoint.
+- Classification fallback: integrated historical classification retrieval tool (getHistoricalClassifications).
+
+Forward Deployed Engineer alignment:
+- Strong at discovery → implementation: clarifies ambiguous requirements and ships end-to-end.
+- Works close to infrastructure and data correctness; builds deterministic paths where needed.
+- Comfortable in production: debugs failures, improves reliability, and handles edge cases.
+
+================================================================================
+PREVIOUS EXPERIENCE (CHRONOLOGICAL)
+================================================================================
+1) Center for Oceanic-Atmospheric Prediction Studies (COAPS)
+Title: Software Engineer
+Dates: May 2023 – May 2024
+Location: Tallahassee, FL
+Highlights:
+- Built Python + Apache Airflow pipelines processing 1M+ data points.
+- Implemented scalable PostgreSQL architecture managing 10+ TB of data.
+- Built Django REST Framework APIs supporting analytics workflows and large user bases.
+- Delivered React + Plotly dashboards for interactive analytics.
+
+2) Florida State University — Department of Scientific Computing
+Title: Graduate Research Assistant
+Dates: Aug 2022 – Apr 2023
+Location: Tallahassee, FL
+Highlights:
+- Built deep learning systems in PyTorch/TensorFlow.
+- Achieved 0.92 F1-score and 0.95 AUC-ROC for real-time anomaly classification.
+- Wrote custom CUDA C++ kernels; reduced processing time by 40%.
+- Improved throughput by ~30% via GPU clustering and HPC techniques.
+
+3) ACS Pvt. Ltd (Mumbai, India)
+Title: DevOps Engineer
+Dates: Jan 2021 – Dec 2021
+Highlights:
+- Designed and deployed CI/CD pipelines using Jenkins and Docker.
+- Integrated AWS CloudWatch monitoring; reduced MTTR by 80%.
+- Deployed containerized applications on AWS; addressed issues and vulnerabilities.
+
+4) Cart Geek (Mumbai, India)
+Title: Web Development Intern
+Dates: Jun 2020 – Dec 2020
+Highlights:
+- Built and deployed web apps/APIs (ASP.NET Core experience historically noted).
+- Worked with Azure (VMs, Load Balancer, Traffic Manager) and GCP (Compute Engine, Cloud Storage).
+- Supported production UI + backend delivery.
+
+================================================================================
+EDUCATION
+================================================================================
+Florida State University — M.S. Computer Science (May 2024)
+GPA: 3.8 / 4.0
+Relevant courses: Data Mining, Machine Learning, Data Structures & Algorithms, Database Systems, Artificial Intelligence
+
+NMIMS University — B.Tech Information Technology (Aug 2022)
+GPA: 3.3 / 4.0
+
+================================================================================
+CORE SKILLS (KEYWORDS + GROUPS)
+================================================================================
+Programming Languages:
+- Python, C/C++ (CUDA), Java, C#, Rust, JavaScript, TypeScript, SQL, Swift, PHP, R
+
+AI / ML / LLM:
+- LangChain, LangGraph, RAG (Retrieval-Augmented Generation), prompt engineering
+- Vector embeddings, similarity search, evaluation (precision/recall, perplexity for LMs)
+- PyTorch, TensorFlow, OpenCV
+- Transformers, text completion models, ReAct-style agent patterns
+
+Backend / Web:
+- Django, Django REST Framework, REST APIs, streaming endpoints
+- Node.js, React, TypeScript
+
+Data / Storage / Search:
+- PostgreSQL, MySQL
+- OpenSearch (vector indices), FAISS
+- Metadata-based filtering, index lifecycle management
+
+DevOps / Cloud:
+- Docker, Kubernetes, Jenkins, GitLab CI/CD, GitHub
+- AWS (EC2, S3, CloudWatch), Azure, GCP
+
+================================================================================
+SELECTED PROJECTS (HIGH SIGNAL)
+================================================================================
+Project: Intelligent AI Chatbot for Personal Portfolio (May 2024 – Ongoing)
+- Goal: Answer questions about Shaurya’s resume/projects with grounded retrieval.
+- Stack: open-source LLMs + RAG + vector DB (Chroma in portfolio context), LangChain.
+- Outcome: Personal assistant for portfolio; demonstrates applied RAG + UX integration.
+
+Project: Transformer Text Completion Model (Feb 2024 – Apr 2024)
+- Goal: Build a text completion model using Transformer architecture.
+- Stack: Python, PyTorch/TensorFlow, multi-GPU training (A100s in academic environment).
+- Metrics/analysis: tracked training/validation loss, perplexity, convergence behavior.
+
+Project: Polyp Segmentation using Deep Learning (Aug 2023 – Dec 2023)
+- Stack: PyTorch, OpenCV
+- Result: strong segmentation metrics (historically noted DSC ~0.92, JC ~0.86).
+
+================================================================================
+WORK STYLE (HOW SHAURYA OPERATES)
+================================================================================
+Engineering style:
+- Strong preference for deterministic correctness for ranking/metric queries.
+- Builds guardrails and tool constraints to reduce hallucinations in LLM systems.
+- Comfortable owning production code paths and debugging environments end-to-end.
+- Values clear documentation: implementation notes per file, system design diagrams, and crisp templates.
+
+Collaboration:
+- Works across product/vertical teams; translates requirements into implementation plans.
+- Proactive about improving PM→dev communication (AI-powered intake forms, structured briefs).
+
+Communication:
+- Prefers concise, high-signal writing (minimal walls of text).
+- Professional, direct, and outcome-oriented.
+
+================================================================================
+FORWARD DEPLOYED ENGINEER (FDE) POSITIONING
+================================================================================
+FDE strengths Shaurya can credibly claim:
+- Customer/vertical collaboration: integrates AI into real workflows and data products.
+- Systems debugging: API/data correctness issues, environment inconsistencies, streaming reliability.
+- Rapid shipping: moves from ambiguous requirements → working deployed system.
+- Platform mindset: reusable workflows, tools, registries, and guardrails rather than one-offs.
+
+FDE-relevant keywords:
+- “deploy”, “production”, “customer-facing”, “integration”, “end-to-end”, “tooling”, “reliability”
+- “APIs”, “data pipelines”, “vector search”, “agent orchestration”, “streaming”
+
+================================================================================
+FREQUENT QUESTIONS (Q/A PAIRS FOR RAG)
+================================================================================
+Q: Who is Shaurya Tiwari?
+A: Shaurya Tiwari is an AI Software Engineer focused on building and deploying production AI systems, especially agentic workflows, retrieval systems, and scalable backends.
+
+Q: Where does Shaurya work now?
+A: U.S. News & World Report, as an AI Software Engineer working on ByteSage platform to support multiple AI products and data analytics systems like Academic Insights AI assistant that produce analytical graphs and data based on natural language interaction for data analysts and researchers (Aug 2024–Present).
+Q: What is ByteSage?
+A: ByteSage is a Django-based backend platform used to power AI-driven products such as Academic Insights AI Assistant (and related internal AI integrations).
+
+Q: What kind of AI systems does Shaurya build?
+A: Agentic RAG systems using LangChain/LangGraph, vector search with OpenSearch/FAISS, and streaming AI endpoints for real-time user experiences. He emphasizes correctness, determinism, and guardrails.
+
+Q: What is Shaurya’s strongest technical area?
+A: Production AI system engineering: combining backend engineering (Django, APIs), agent orchestration (LangGraph), and retrieval infrastructure (OpenSearch vector search) with reliability hardening.
+
+Q: What is Shaurya’s education?
+A: M.S. Computer Science from Florida State University (May 2024, GPA 3.88), B.Tech IT from NMIMS University (Aug 2022, GPA 3.3).
+
+Q: What tools/frameworks does Shaurya use for LLM applications?
+A: LangChain, LangGraph, vector stores (OpenSearchVectorSearch, FAISS), retrieval patterns, structured tool calls, and streaming responses in Django.
+
+Q: What is Shaurya’s background before U.S. News?
+A: Software Engineer at COAPS (Airflow + PostgreSQL + Django APIs), Graduate Research Assistant (PyTorch/TensorFlow + CUDA optimization), DevOps Engineer (Jenkins/Docker/AWS), and Web Development Intern (Azure/GCP).
+
+Q: Does Shaurya have DevOps experience?
+A: Yes. He built CI/CD pipelines with Jenkins/Docker, deployed on AWS, and used CloudWatch for monitoring; reduced MTTR substantially in prior DevOps work.
+
+Q: What is Shaurya’s GitHub and website?
+A: GitHub: github.com/Shazam6565. Website: shauryatiwari.com.
+
+Q: Is Shaurya a fit for Forward Deployed Engineer roles?
+A: Yes. He has experience shipping customer-facing AI systems end-to-end, translating ambiguous requirements into working deployments, and debugging production issues across data, APIs, and infrastructure.
+
+================================================================================
+KEYWORDS / SYNONYMS (FOR BETTER RETRIEVAL)
+================================================================================
+Name variants:
+- Shaurya, Shaurya Tiwari, Batman
+
+Roles:
+- AI Software Engineer, Software Engineer, Forward Deployed Engineer, AI Platform Engineer, Full-stack AI engineer
+
+Core tech keywords:
+- Django, Python, DRF, REST, StreamingHttpResponse, LangChain, LangGraph, ReAct agent, tool calling
+- OpenSearch, OpenSearchVectorSearch, vector database, FAISS, embeddings, similarity search, metadata filtering
+- Airflow, ETL, PostgreSQL, data pipelines
+- CUDA, GPU kernels, PyTorch, TensorFlow
+
+Domains:
+- Academic Insights, Education analytics, ranking/metrics, B2B data products
+
+================================================================================
+END OF FILE
+================================================================================
