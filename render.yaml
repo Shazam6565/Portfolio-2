@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: portfolio-rag-backend
+    env: docker
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: backend
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: OPENAI_API_KEY
+        sync: false
