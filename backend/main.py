@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 
+from langchain.chains import RetrievalQA
+from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+
 load_dotenv()
 
 app = FastAPI(title="Portfolio RAG Chatbot API")
@@ -39,14 +43,11 @@ async def chat_endpoint(request: ChatRequest):
     vector_db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
     
     # Simple retrieval chain
-    from langchain.chains import RetrievalQA
-    from langchain_openai import ChatOpenAI
     
     llm = ChatOpenAI(temperature=0.0) # This is where we set the LLM to be used as ChatOpenAI
     retriever = vector_db.as_retriever(search_kwargs={"k": 3}) # k is the number of documents to retrieve
     
     # Custom Prompt Template
-    from langchain.prompts import PromptTemplate
     
     template = """You are a helpful AI assistant for Shaurya's Portfolio.
     Use the following pieces of context to answer the question at the end.
