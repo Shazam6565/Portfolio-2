@@ -129,10 +129,11 @@ const About = () => {
     'Python',
     'Django',
     'LangChain/LangGraph',
-    'Proprietieary Models',
-    'Open-Source LLMs',
-    'Airflow [ETL]',
-    'React',
+    'AWS Cloud Services',
+    'Gitlab',
+    'New Relic',
+    'Jenkins',
+    'Docker',
   ];
 
   return (
@@ -143,34 +144,33 @@ const About = () => {
         <StyledText>
           <div>
             <p>
-              Hello! I'm Shaurya Tiwari, a software engineer with a Master's degree in Computer
-              Science from Florida State University, currently working on production AI systems at{' '}
+              Hello! I'm Shaurya Tiwari, an AI software engineer with a Master's degree in Computer
+              Science from Florida State University, currently working on production AI
+              infrastructure to support 9+ verticals at{' '}
               <a href="https://www.usnews.com/">U.S. News &amp; World Report</a>. I specialize in
               building reliable backend platforms, data-driven AI applications, and intelligent
-              systems that bridge machine learning with real-world software products. In my work, I
-              focus on designing scalable architectures, integrating AI safely into production
-              systems, and solving problems where correctness and performance truly matter.
+              systems that bridge AI with real-world software products. In my work, I focus on
+              designing scalable architectures, integrating AI safely into production systems, and
+              solving problems where correctness and performance truly matter.
             </p>
 
             <p>
               Prior to this, I’ve had the privilege of working at a{' '}
-              <a href="https://www.coaps.fsu.edu/about-us">Data product Company</a>,{' '}
-              <a href="https://www.sc.fsu.edu/">Research department</a>, a{' '}
-              <a href="https://www.itsabacus.com/">Software consultancy</a>, and a{' '}
-              <a href="https://cart-geek.com/">UI development studio</a>. My main focus these days
-              is building artificially smart, inclusive products and digital experiences. Feel free
-              to explore my portfolio to learn more about my projects and experience. Also, don't
-              forget to check out my{' '}
-              <a href="https://www.shauryatiwari.com/chat"> AI Assistant here</a> in case you want
-              to learn more about me.
+              <a href="https://www.coaps.fsu.edu/about-us">Data product Organization</a>,{' '}
+              <a href="https://www.sc.fsu.edu/">Research department at Florida State University</a>,{' '}
+              <a href="https://www.itsabacus.com/">Software consultancy</a>, and{' '}
+              <a href="https://cart-geek.com/">UI/UX designing studio</a>. Feel free to explore my
+              portfolio to learn more about my projects and experience. Also, don't forget to check
+              out my <a href="https://www.shauryatiwari.com/chat"> AI Assistant here</a> in case you
+              want to learn more about me or ask specific questions related to my come up.
             </p>
 
             <p>
-              If you really made it till here, then you must check out me being cringe on{' '}
+              If you really made it till here, then you must check out me being corny on{' '}
               <a href="https://www.youtube.com/channel/UC1sfE7YdmxsUdJaOo4vhqVQ">
                 my YouTube Livestream channel
               </a>{' '}
-              that features me trying to figure my life out with AI as the side character.
+              that features me trying to figure my life out with LLMs.
             </p>
 
             <p>Here are a few technologies I’ve been working with recently:</p>

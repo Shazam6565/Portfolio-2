@@ -8,16 +8,11 @@ import sr from '@utils/sr';
 import { usePrefersReducedMotion } from '@hooks';
 
 const StyledJobsSection = styled.section`
-  max-width: 961px;
+  max-width: 700px;
 
   .inner {
-    display: flex;
+    display: block;
 
-    @media (max-width: 600px) {
-      display: block;
-    }
-
-    // Prevent container from jumping
     @media (min-width: 700px) {
       min-height: 340px;
     }
@@ -32,34 +27,32 @@ const StyledTabList = styled.div`
   margin: 0;
   list-style: none;
 
-  @media (max-width: 600px) {
-    display: flex;
-    overflow-x: auto;
-    width: calc(100% + 100px);
-    padding-left: 50px;
-    margin-left: -50px;
-    margin-bottom: 30px;
+  display: flex;
+  overflow-x: auto;
+  width: 100%;
+  margin-bottom: 30px;
+
+  /* Hide scrollbar */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none;
   }
-  @media (max-width: 480px) {
+
+  @media (max-width: 600px) {
     width: calc(100% + 50px);
-    padding-left: 25px;
     margin-left: -25px;
+    padding-left: 25px;
   }
 
   li {
     &:first-of-type {
       @media (max-width: 600px) {
-        margin-left: 50px;
-      }
-      @media (max-width: 480px) {
         margin-left: 25px;
       }
     }
     &:last-of-type {
       @media (max-width: 600px) {
-        padding-right: 50px;
-      }
-      @media (max-width: 480px) {
         padding-right: 25px;
       }
     }
@@ -70,27 +63,27 @@ const StyledTabButton = styled.button`
   ${({ theme }) => theme.mixins.link};
   display: flex;
   align-items: center;
-  width: 100%;
+  justify-content: center;
   height: var(--tab-height);
-  padding: 0 20px 2px;
-  border-left: 2px solid var(--lightest-navy);
+  padding: 0 15px;
+  border: 0;
+  border-bottom: 2px solid var(--lightest-navy);
   background-color: transparent;
   color: ${({ isActive }) => (isActive ? 'var(--green)' : 'var(--slate)')};
   font-family: var(--font-mono);
   font-size: var(--fz-xs);
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
+  min-width: 120px;
 
   @media (max-width: 768px) {
-    padding: 0 15px 2px;
+    padding: 0 15px;
   }
   @media (max-width: 600px) {
     ${({ theme }) => theme.mixins.flexCenter};
     min-width: 120px;
     padding: 0 15px;
-    border-left: 0;
     border-bottom: 2px solid var(--lightest-navy);
-    text-align: center;
   }
 
   &:hover,
@@ -101,39 +94,36 @@ const StyledTabButton = styled.button`
 
 const StyledHighlight = styled.div`
   position: absolute;
-  top: 0;
+  top: auto;
+  bottom: 0;
   left: 0;
   z-index: 10;
-  width: 2px;
-  height: var(--tab-height);
+  width: 100%;
+  height: 2px;
   border-radius: var(--border-radius);
   background: var(--green);
-  transform: translateY(calc(${({ activeTabId }) => activeTabId} * var(--tab-height)));
-  transition: transform 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+  opacity: 0.5;
+  transition: transform 0.25s cubic-bezier(0.645, 0.045, 0.355, 1),
+    width 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
   transition-delay: 0.1s;
 
+  /* Dynamic styles injected via props/attrs in component */
+  width: ${({ tabWidth }) => (tabWidth ? `${tabWidth}px` : '0px')};
+  transform: translateX(${({ tabOffset }) => (tabOffset ? `${tabOffset}px` : '0px')});
+
   @media (max-width: 600px) {
-    top: auto;
-    bottom: 0;
-    width: 100%;
-    max-width: var(--tab-width);
-    height: 2px;
-    margin-left: 50px;
     transform: translateX(calc(${({ activeTabId }) => activeTabId} * var(--tab-width)));
-  }
-  @media (max-width: 480px) {
-    margin-left: 25px;
+    /* Fallback for smaller screens matching previous mobile behavior if essential, 
+       but the new JS calculation should work universally. 
+       Removing media query reliance for positioning to keep it consistent. */
+    transform: translateX(${({ tabOffset }) => (tabOffset ? `${tabOffset}px` : '0px')});
   }
 `;
 
 const StyledTabPanels = styled.div`
   position: relative;
   width: 100%;
-  margin-left: 20px;
-
-  @media (max-width: 600px) {
-    margin-left: 0;
-  }
+  margin-left: 0;
 `;
 
 const StyledTabPanel = styled.div`
@@ -169,7 +159,7 @@ const Jobs = () => {
     query {
       jobs: allMarkdownRemark(
         filter: { fileAbsolutePath: { regex: "/content/jobs/" } }
-        
+        sort: { fields: [frontmatter___date], order: DESC }
       ) {
         edges {
           node {
@@ -187,7 +177,6 @@ const Jobs = () => {
     }
   `);
 
-
   const jobsData = data.jobs.edges;
 
   const [activeTabId, setActiveTabId] = useState(0);
@@ -196,6 +185,10 @@ const Jobs = () => {
   const revealContainer = useRef(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
+  // State for tab highlight
+  const [tabWidth, setTabWidth] = useState(0);
+  const [tabOffset, setTabOffset] = useState(0);
+
   useEffect(() => {
     if (prefersReducedMotion) {
       return;
@@ -203,6 +196,15 @@ const Jobs = () => {
 
     sr.reveal(revealContainer.current, srConfig());
   }, []);
+
+  // Update highlight position when active tab changes
+  useEffect(() => {
+    const activeTab = tabs.current[activeTabId];
+    if (activeTab) {
+      setTabWidth(activeTab.offsetWidth);
+      setTabOffset(activeTab.offsetLeft);
+    }
+  }, [activeTabId]);
 
   const focusTab = () => {
     if (tabs.current[tabFocus]) {
@@ -225,13 +227,15 @@ const Jobs = () => {
   // Focus on tabs when using up & down arrow keys
   const onKeyDown = e => {
     switch (e.key) {
-      case KEY_CODES.ARROW_UP: {
+      case KEY_CODES.ARROW_UP:
+      case KEY_CODES.ARROW_LEFT: {
         e.preventDefault();
         setTabFocus(tabFocus - 1);
         break;
       }
 
-      case KEY_CODES.ARROW_DOWN: {
+      case KEY_CODES.ARROW_DOWN:
+      case KEY_CODES.ARROW_RIGHT: {
         e.preventDefault();
         setTabFocus(tabFocus + 1);
         break;
@@ -262,12 +266,13 @@ const Jobs = () => {
                   role="tab"
                   tabIndex={activeTabId === i ? '0' : '-1'}
                   aria-selected={activeTabId === i ? true : false}
-                  aria-controls={`panel-${i}`}>
+                  aria-controls={`panel-${i}`}
+                >
                   <span>{company}</span>
                 </StyledTabButton>
               );
             })}
-          <StyledHighlight activeTabId={activeTabId} />
+          <StyledHighlight tabWidth={tabWidth} tabOffset={tabOffset} />
         </StyledTabList>
 
         <StyledTabPanels>
@@ -284,7 +289,8 @@ const Jobs = () => {
                     tabIndex={activeTabId === i ? '0' : '-1'}
                     aria-labelledby={`tab-${i}`}
                     aria-hidden={activeTabId !== i}
-                    hidden={activeTabId !== i}>
+                    hidden={activeTabId !== i}
+                  >
                     <h3>
                       <span>{title}</span>
                       <span className="company">

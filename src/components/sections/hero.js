@@ -62,7 +62,7 @@ const Hero = () => {
 
   const one = <h1>Mid - level A.I. Software Engineer</h1>;
   const two = <h2 className="big-heading">Shaurya Tiwari</h2>;
-  const three = <h3 className="big-heading">From customer problems to production system.</h3>;
+  const three = <h3 className="big-heading">Fundamental truths to production systems.</h3>;
   const four = (
     <>
       <p>Forward-deployed AI • Backend systems • Data platforms</p>

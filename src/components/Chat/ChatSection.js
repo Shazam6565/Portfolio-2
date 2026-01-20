@@ -1,129 +1,284 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const dotPulse = keyframes`
+  0% { opacity: 0.5; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.5; transform: scale(0.8); }
+`;
 
 const StyledChatSection = styled.section`
   ${({ theme }) => theme.mixins.flexCenter};
   flex-direction: column;
-  max-width: 700px;
+  width: 75vw;
+  max-width: 1400px;
   margin: 0 auto 100px;
   padding: 0 20px;
+  position: relative;
+  min-height: 50vh;
 
-  h2 {
-    font-size: clamp(24px, 5vw, 32px);
+  header {
+    width: 100%;
     margin-bottom: 30px;
-    color: var(--lightest-slate);
+    position: relative;
     text-align: center;
 
-    .green {
-      color: var(--green);
+    /* AI Label positioned absolutely top-right of the header area, or inline if preferred minimal */
+    .ai-label {
+      position: absolute;
+      top: -20px;
+      right: 0;
       font-family: var(--font-mono);
-      font-size: var(--fz-md);
-      display: block;
-      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--green);
+      opacity: 0.6;
+      border: 1px solid var(--green);
+      padding: 2px 8px;
+      border-radius: 4px;
+
+      @media (max-width: 480px) {
+        position: static;
+        display: inline-block;
+        margin-bottom: 15px;
+      }
+    }
+
+    h2 {
+      font-family: var(--font-sans);
+      font-size: clamp(32px, 5vw, 42px);
+      font-weight: 600;
+      color: var(--lightest-slate);
+      line-height: 1.1;
+      margin: 0;
     }
   }
 `;
 
 const ChatContainer = styled.div`
   width: 100%;
-  height: 500px;
-  background-color: rgba(17, 34, 64, 0.7); /* Light Navy with opacity */
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--green);
-  border-radius: var(--border-radius);
+  height: 75vh;
+  background-color: rgba(17, 34, 64, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 30px -15px var(--navy-shadow);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  position: relative;
+
+  /* Subtle Pattern Overlay */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(var(--slate) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+  }
 `;
 
 const MessagesWindow = styled.div`
   flex: 1;
-  padding: 20px;
+  padding: 30px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
 
   /* Scrollbar styling */
   &::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   &::-webkit-scrollbar-thumb {
     background-color: var(--dark-slate);
-    border-radius: 4px;
+    border-radius: 10px;
   }
   &::-webkit-scrollbar-track {
-    background-color: var(--navy);
+    background-color: transparent;
   }
 `;
 
 const MessageBubble = styled.div`
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: var(--fz-sm);
-  line-height: 1.5;
+  max-width: 85%;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: var(--fz-md);
+  line-height: 1.6;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  animation: ${fadeInUp} 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 
   /* User Styling */
-  &.user {
-    align_self: flex-end;
-    background-color: rgba(100, 255, 218, 0.1); /* Green tint */
-    border: 1px solid var(--green);
-    color: var(--green);
-    border-bottom-right-radius: 2px;
-  }
+  ${props =>
+    props.messageType === 'user' &&
+    css`
+      align-self: flex-end;
+      background-color: var(--green);
+      color: var(--navy);
+      border-bottom-right-radius: 4px;
+
+      p {
+        margin: 0;
+      }
+    `}
 
   /* Bot Styling */
-  &.bot {
-    align_self: flex-start;
-    background-color: var(--light-navy);
-    border: 1px solid var(--light-slate);
-    color: var(--lightest-slate);
-    border-bottom-left-radius: 2px;
-  }
+  ${props =>
+    props.messageType === 'bot' &&
+    css`
+      align-self: flex-start;
+      background-color: var(--light-navy);
+      color: var(--lightest-slate);
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--light-slate);
 
-  /* Typing Indicator */
-  &.typing {
-    font-style: italic;
-    color: var(--slate);
-    background: transparent;
-    border: none;
-    padding: 0;
-  }
+      /* Markdown Styles */
+      p {
+        margin: 0 0 10px 0;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+      ul,
+      ol {
+        margin: 0 0 10px 20px;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 5px;
+      }
+      strong {
+        color: var(--green);
+        font-weight: 600;
+      }
+      a {
+        color: var(--green);
+        text-decoration: underline;
+        &:hover {
+          text-decoration: none;
+        }
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 15px 0 10px;
+        font-size: 1.1em;
+        color: var(--white);
+      }
+    `}
+
+  /* Typing Indicator Special Styling */
+  ${props =>
+    props.messageType === 'typing' &&
+    css`
+      align-self: flex-start;
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      margin-left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    `}
+`;
+
+const TypingDot = styled.span`
+  width: 8px;
+  height: 8px;
+  background-color: var(--slate);
+  border-radius: 50%;
+  display: inline-block;
+  animation: ${dotPulse} 1.4s infinite ease-in-out both;
+  animation-delay: ${props => props.delay || '0s'};
 `;
 
 const InputArea = styled.form`
   display: flex;
-  gap: 10px;
-  padding: 15px;
-  background-color: var(--navy);
-  border-top: 1px solid var(--light-navy);
+  align-items: flex-end;
+  gap: 15px;
+  padding: 20px 30px;
+  background-color: rgba(10, 25, 47, 0.8);
+  position: relative;
+  z-index: 2;
 
   input {
     flex: 1;
-    background-color: var(--light-navy);
-    border: 1px solid var(--light-slate);
-    border-radius: 4px;
-    padding: 10px 15px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 0;
     color: var(--lightest-slate);
     font-family: var(--font-sans);
-    font-size: var(--fz-sm);
+    font-size: var(--fz-md);
+    transition: all 0.2s ease;
 
     &:focus {
       outline: none;
-      border-color: var(--green);
+      border-bottom: 1px solid var(--green);
+      box-shadow: 0 1px 0 0 var(--green);
     }
 
     &::placeholder {
       color: var(--slate);
+      opacity: 0.7;
     }
   }
+`;
 
-  button {
-    ${({ theme }) => theme.mixins.smallButton};
-    padding: 10px 20px;
+const SendButton = styled.button`
+  background-color: var(--green);
+  color: var(--navy);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 4px 10px rgba(100, 255, 218, 0.2);
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: var(--green);
+    box-shadow: 0 6px 15px rgba(100, 255, 218, 0.3);
+  }
+  &:disabled {
+    background-color: var(--slate);
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    margin-left: 2px; /* Visual balance for arrow */
   }
 `;
 
@@ -132,20 +287,28 @@ const ChatSection = () => {
     {
       role: 'bot',
       content:
-        'Hello! I\'m Shaurya\'s AI assistant. Ask me anything about his experience, skills, or projects.',
+        'Hello, I\'m Shaurya\'s assistant. Ask me anything about him or his career to know him better.',
+      isGreeting: true,
     },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  // Check if it's the initial mount to prevent auto-scrolling the entire page
+  const isFirstRender = useRef(true);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
   useEffect(() => {
+    // Skip scrolling on initial render to avoid page jump
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     scrollToBottom();
-  }, [messages]);
+  }, [messages, loading]);
 
   const handleSend = async e => {
     e.preventDefault();
@@ -159,8 +322,9 @@ const ChatSection = () => {
     setLoading(true);
 
     try {
-      // Connect to Backend API
+      // Use production backend
       const API_URL = 'https://shaurya-chat-endpoint.onrender.com/chat';
+      // const API_URL = 'http://localhost:8001/chat';
 
       const response = await axios.post(API_URL, {
         message: userMsg.content,
@@ -181,19 +345,31 @@ const ChatSection = () => {
 
   return (
     <StyledChatSection id="chat">
-      <h2>
-        <span className="green">AI</span>
-        What do you wish to know about me?
-      </h2>
+      <header>
+        <span className="ai-label">AI ASSISTANT</span>
+        <h2>Ask me anything</h2>
+      </header>
 
       <ChatContainer>
         <MessagesWindow>
           {messages.map((msg, i) => (
-            <MessageBubble key={i} className={msg.role}>
-              {msg.content}
+            <MessageBubble
+              key={i}
+              messageType={msg.role}
+              style={msg.isGreeting ? { opacity: 0.8 } : {}}
+            >
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
             </MessageBubble>
           ))}
-          {loading && <MessageBubble className="typing">Thinking...</MessageBubble>}
+
+          {loading && (
+            <MessageBubble messageType="typing">
+              <TypingDot delay="0s" />
+              <TypingDot delay="0.2s" />
+              <TypingDot delay="0.4s" />
+            </MessageBubble>
+          )}
+
           <div ref={messagesEndRef} />
         </MessagesWindow>
 
@@ -202,11 +378,13 @@ const ChatSection = () => {
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Ask about my Python experience..."
+            placeholder="Ask anything..."
           />
-          <button type="submit" disabled={loading}>
-            Send
-          </button>
+          <SendButton type="submit" disabled={loading} aria-label="Send Message">
+            <svg viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+          </SendButton>
         </InputArea>
       </ChatContainer>
     </StyledChatSection>

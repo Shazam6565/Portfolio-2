@@ -46,7 +46,7 @@ module.exports = {
       url: '/#contact',
     },
     {
-      name: 'Consciousness',
+      name: 'AI Assistant',
       url: '/chat',
     },
   ],
