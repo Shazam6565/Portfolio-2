@@ -6,7 +6,10 @@ import os
 from dotenv import load_dotenv
 
 # Import the new logic
-from .query import answer_fit_question
+try:
+    from .query import answer_fit_question
+except ImportError:
+    from query import answer_fit_question
 
 load_dotenv()
 
