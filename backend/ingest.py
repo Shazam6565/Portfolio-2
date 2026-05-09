@@ -3,7 +3,7 @@ import re
 import shutil
 from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
 
@@ -100,11 +100,7 @@ def ingest():
     metadatas = [d["metadata"] for d in doc_dicts]
 
     # 3. Initialize Embedding Function
-    if not os.getenv("OPENAI_API_KEY"):
-        print("Error: OPENAI_API_KEY not found in environment.")
-        return
-        
-    embedding_function = OpenAIEmbeddings()
+    embedding_function = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
     # 4. Clear existing DB if we want a fresh start (Optional, but good for idempotent runs)
     if CHROMA_PATH.exists():

@@ -6,14 +6,14 @@
   "auditLog": "/Users/shauryatiwari/Desktop/gits/ST-PRTFLO-2/logs/.fbd3851956cddebab856a033f50c0515f085102c-audit.json",
   "files": [
     {
-      "date": 1762577805876,
-      "name": "/Users/shauryatiwari/Desktop/gits/ST-PRTFLO-2/logs/mcp-puppeteer-2025-11-07.log",
-      "hash": "387459884f89cf13bab1185f6315ee685a58518342dc590cff84b7ecd91e9de3"
+      "date": 1777703300206,
+      "name": "/Users/shauryatiwari/Desktop/gits/ST-PRTFLO-2/logs/mcp-puppeteer-2026-05-02.log",
+      "hash": "c32e1489af3027ccb65fdce506081ad8f4bc5fea7fc3c30026a0e1fed6847961"
     },
     {
-      "date": 1762599412984,
-      "name": "/Users/shauryatiwari/Desktop/gits/ST-PRTFLO-2/logs/mcp-puppeteer-2025-11-08.log",
-      "hash": "5a0883e91abe68915793c8f297b87e8b3209e82151d29f301710d177e131f92e"
+      "date": 1778289832216,
+      "name": "/Users/shauryatiwari/Desktop/gits/ST-PRTFLO-2/logs/mcp-puppeteer-2026-05-08.log",
+      "hash": "103b4ea753cddeb926d5a1783a05ba43572717f5e0877a927900cd3398ef0bb1"
     }
   ],
   "hashType": "sha256"

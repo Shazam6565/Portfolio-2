@@ -5,7 +5,8 @@ import requests
 from pathlib import Path
 from dotenv import load_dotenv
 
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_groq import ChatGroq
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.prompts import PromptTemplate
 
@@ -21,7 +22,7 @@ def get_db():
     
     return Chroma(
         persist_directory=str(CHROMA_PATH),
-        embedding_function=OpenAIEmbeddings()
+        embedding_function=HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     )
 
 def fetch_role_context(company: str, role: str) -> str:
@@ -69,7 +70,7 @@ def fetch_role_context(company: str, role: str) -> str:
 
 def answer_fit_question(query: str):
     db = get_db()
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2) # Low temp for factual analysis
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.2)
 
     # 1. Retrieve Profile Context
     print("Searching internal profile...")

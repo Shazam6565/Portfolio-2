@@ -34,8 +34,8 @@ async def root():
 
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
-    if not os.getenv("OPENAI_API_KEY"):
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
+    if not os.getenv("GROQ_API_KEY"):
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY not set")
     
     try:
         # Use the advanced RAG + Comparative function
