@@ -322,9 +322,10 @@ const ChatSection = () => {
     setLoading(true);
 
     try {
-      // Use production backend
-      const API_URL = 'https://shaurya-chat-endpoint.onrender.com/chat';
-      // const API_URL = 'http://localhost:8001/chat';
+      const API_URL =
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:8001/chat'
+          : 'https://shaurya-chat-endpoint.onrender.com/chat';
 
       const response = await axios.post(API_URL, {
         message: userMsg.content,
