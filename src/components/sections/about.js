@@ -1,19 +1,7 @@
 import React from 'react';
-import { StaticImage } from 'gatsby-plugin-image';
 import styled from 'styled-components';
 
-const StyledAboutSection = styled.section`
-  .inner {
-    display: grid;
-    grid-template-columns: 1fr 160px;
-    grid-gap: 40px;
-    align-items: start;
-
-    @media (max-width: 768px) {
-      display: block;
-    }
-  }
-`;
+const StyledAboutSection = styled.section``;
 const StyledText = styled.div`
   ul.skills-list {
     display: grid;
@@ -30,22 +18,6 @@ const StyledText = styled.div`
     }
   }
 `;
-const StyledPic = styled.div`
-  width: 160px;
-
-  @media (max-width: 768px) {
-    margin: 40px 0 0;
-  }
-
-  .img {
-    display: block;
-    width: 100%;
-    border: 1px solid var(--line);
-    border-radius: var(--border-radius);
-    filter: grayscale(100%);
-  }
-`;
-
 const About = () => {
   const skills = [
     'Python',
@@ -102,17 +74,6 @@ const About = () => {
             {skills && skills.map((skill, i) => <li key={i}>{skill}</li>)}
           </ul>
         </StyledText>
-
-        <StyledPic>
-          <StaticImage
-            className="img"
-            src="../../images/myheadshot.jpg"
-            width={320}
-            quality={95}
-            formats={['AUTO', 'WEBP', 'AVIF']}
-            alt="Headshot"
-          />
-        </StyledPic>
       </div>
     </StyledAboutSection>
   );

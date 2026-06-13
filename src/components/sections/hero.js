@@ -83,7 +83,7 @@ const Hero = () => {
         <p className="hero-subtitle">
           AI Software Engineer
           <br />
-          Fundamental truths to production systems.
+          Shipping AI that holds up in production.
         </p>
 
         <p className="hero-description">Forward-deployed AI • Backend systems • Data platforms</p>
