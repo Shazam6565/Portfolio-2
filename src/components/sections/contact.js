@@ -1,79 +1,58 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { srConfig } from '@config';
-import sr from '@utils/sr';
-import { usePrefersReducedMotion } from '@hooks';
+import { email } from '@config';
 
 const StyledContactSection = styled.section`
-  max-width: 600px;
-  margin: 0 auto 100px;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    margin: 0 auto 50px;
-  }
-
-  .overline {
-    display: block;
-    margin-bottom: 20px;
-    color: var(--green);
-    font-family: var(--font-mono);
-    font-size: var(--fz-md);
-    font-weight: 400;
-
-    &:before {
-      bottom: 0;
-      font-size: var(--fz-sm);
-    }
-
-    &:after {
-      display: none;
-    }
-  }
-
   .title {
-    font-size: clamp(40px, 5vw, 60px);
+    margin: 0 0 16px;
+    font-size: var(--fz-xxl);
   }
 
-  .email-link {
-    ${({ theme }) => theme.mixins.bigButton};
-    margin-top: 50px;
+  p {
+    max-width: 540px;
+    color: var(--text-secondary);
+  }
+
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    margin-top: 24px;
+
+    a {
+      color: var(--text);
+      font-size: var(--fz-sm);
+      text-decoration: underline;
+      text-decoration-color: var(--line);
+      text-underline-offset: 3px;
+
+      &:hover,
+      &:focus-visible {
+        text-decoration-color: var(--text);
+      }
+    }
   }
 `;
 
-const Contact = () => {
-  const revealContainer = useRef(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
+const Contact = () => (
+  <StyledContactSection id="contact">
+    <h2 className="numbered-heading">What’s Next?</h2>
 
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      return;
-    }
+    <h3 className="title">Get In Touch</h3>
 
-    sr.reveal(revealContainer.current, srConfig());
-  }, []);
+    <p>
+      Looking forward to discussing potential opportunities or answering any inquiries. Whether you
+      have a question or just want to say hi, I’ll try my best to get back to you.
+    </p>
 
-  return (
-    <StyledContactSection id="contact" ref={revealContainer}>
-      <h2 className="numbered-heading overline">What’s Next?</h2>
-
-      <h2 className="title">Get In Touch</h2>
-
-      <p>
-        Looking forward to discussing potential opportunities or answering any inquiries. Whether
-        you have a question or just want to say hi, I’ll try my best to get back to you. Get in
-        touch via mail at <a href="mailto:vaasutiwari@gmail.com">vaasutiwari@gmail.com</a>!
-      </p>
-
-      <a
-        className="email-link"
-        href="https://calendly.com/vaasutiwari"
-        target="_blank"
-        rel="noopener noreferrer">
-        Schedule a meeting with me
+    <div className="contact-links">
+      <a href={`mailto:${email}`}>{email}</a>
+      <a href="https://calendly.com/vaasutiwari" target="_blank" rel="noopener noreferrer">
+        Schedule a meeting
       </a>
-    </StyledContactSection>
-  );
-};
+    </div>
+  </StyledContactSection>
+);
 
 export default Contact;

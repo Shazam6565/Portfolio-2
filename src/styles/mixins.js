@@ -1,22 +1,22 @@
 import { css } from 'styled-components';
 
 const button = css`
-  color: var(--green);
+  color: var(--text);
   background-color: transparent;
-  border: 1px solid var(--green);
+  border: 1px solid var(--text);
   border-radius: var(--border-radius);
   font-size: var(--fz-xs);
   font-family: var(--font-mono);
   line-height: 1;
   text-decoration: none;
-  padding: 1.25rem 1.75rem;
+  padding: 0.9rem 1.25rem;
   transition: var(--transition);
 
   &:hover,
   &:focus-visible {
     outline: none;
-    box-shadow: 4px 4px 0 0 var(--green);
-    transform: translate(-5px, -5px);
+    background-color: var(--text);
+    color: var(--bg);
   }
   &:after {
     display: none !important;
@@ -46,39 +46,27 @@ const mixins = {
 
     &:hover,
     &:focus-visible {
-      color: var(--green);
+      color: var(--text);
       outline: 0;
     }
   `,
 
   inlineLink: css`
-    display: inline-block;
+    display: inline;
     position: relative;
-    color: var(--green);
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
     transition: var(--transition);
 
     &:hover,
     &:focus-visible {
-      color: var(--green);
+      color: var(--text);
+      text-decoration-color: var(--text);
       outline: 0;
-      &:after {
-        width: 100%;
-      }
       & > * {
-        color: var(--green) !important;
-        transition: var(--transition);
-      }
-    }
-    &:after {
-      content: '';
-      display: block;
-      width: 0;
-      height: 1px;
-      position: relative;
-      bottom: 0.37em;
-      background-color: var(--green);
-      opacity: 0.5;
-      @media (prefers-reduced-motion: no-preference) {
+        color: var(--text) !important;
         transition: var(--transition);
       }
     }
@@ -87,11 +75,11 @@ const mixins = {
   button,
 
   smallButton: css`
-    color: var(--green);
+    color: var(--text);
     background-color: transparent;
-    border: 1px solid var(--green);
+    border: 1px solid var(--text);
     border-radius: var(--border-radius);
-    padding: 0.75rem 1rem;
+    padding: 0.6rem 0.9rem;
     font-size: var(--fz-xs);
     font-family: var(--font-mono);
     line-height: 1;
@@ -101,8 +89,8 @@ const mixins = {
     &:hover,
     &:focus-visible {
       outline: none;
-      box-shadow: 3px 3px 0 0 var(--green);
-      transform: translate(-4px, -4px);
+      background-color: var(--text);
+      color: var(--bg);
     }
     &:after {
       display: none !important;
@@ -110,11 +98,11 @@ const mixins = {
   `,
 
   bigButton: css`
-    color: var(--green);
+    color: var(--text);
     background-color: transparent;
-    border: 1px solid var(--green);
+    border: 1px solid var(--text);
     border-radius: var(--border-radius);
-    padding: 1.25rem 1.75rem;
+    padding: 0.9rem 1.25rem;
     font-size: var(--fz-sm);
     font-family: var(--font-mono);
     line-height: 1;
@@ -124,8 +112,8 @@ const mixins = {
     &:hover,
     &:focus-visible {
       outline: none;
-      box-shadow: 4px 4px 0 0 var(--green);
-      transform: translate(-5px, -5px);
+      background-color: var(--text);
+      color: var(--bg);
     }
     &:after {
       display: none !important;
@@ -133,29 +121,23 @@ const mixins = {
   `,
 
   boxShadow: css`
-    box-shadow: 0 10px 30px -15px var(--navy-shadow);
-    transition: var(--transition);
-
-    &:hover,
-    &:focus-visible {
-      box-shadow: 0 20px 30px -15px var(--navy-shadow);
-    }
+    box-shadow: none;
   `,
 
   fancyList: css`
     padding: 0;
     margin: 0;
     list-style: none;
-    font-size: var(--fz-lg);
+    font-size: var(--fz-md);
     li {
       position: relative;
-      padding-left: 30px;
-      margin-bottom: 10px;
+      padding-left: 20px;
+      margin-bottom: 6px;
       &:before {
-        content: '▹';
+        content: '–';
         position: absolute;
         left: 0;
-        color: var(--green);
+        color: var(--text-muted);
       }
     }
   `,

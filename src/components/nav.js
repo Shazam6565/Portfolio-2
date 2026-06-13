@@ -7,7 +7,6 @@ import { navLinks } from '@config';
 import { loaderDelay } from '@utils';
 import { useScrollDirection, usePrefersReducedMotion } from '@hooks';
 import { Menu } from '@components';
-import { IconLogo, IconHex } from '@components/icons';
 
 const StyledHeader = styled.header`
   ${({ theme }) => theme.mixins.flexBetween};
@@ -17,11 +16,8 @@ const StyledHeader = styled.header`
   padding: 0px 50px;
   width: 100%;
   height: var(--nav-height);
-  background-color: rgba(10, 25, 47, 0.85);
-  filter: none !important;
-  pointer-events: auto !important;
-  user-select: auto !important;
-  backdrop-filter: blur(10px);
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--line);
   transition: var(--transition);
 
   @media (max-width: 1080px) {
@@ -38,8 +34,6 @@ const StyledHeader = styled.header`
       css`
         height: var(--nav-scroll-height);
         transform: translateY(0px);
-        background-color: rgba(10, 25, 47, 0.85);
-        box-shadow: 0 10px 30px -10px var(--navy-shadow);
       `};
 
     ${props =>
@@ -48,7 +42,6 @@ const StyledHeader = styled.header`
       css`
         height: var(--nav-scroll-height);
         transform: translateY(calc(var(--nav-scroll-height) * -1));
-        box-shadow: 0 10px 30px -10px var(--navy-shadow);
       `};
   }
 `;
@@ -57,53 +50,22 @@ const StyledNav = styled.nav`
   ${({ theme }) => theme.mixins.flexBetween};
   position: relative;
   width: 100%;
-  color: var(--lightest-slate);
-  font-family: var(--font-mono);
-  counter-reset: item 0;
+  color: var(--text);
   z-index: 12;
 
   .logo {
     ${({ theme }) => theme.mixins.flexCenter};
 
     a {
-      color: var(--green);
-      width: 42px;
-      height: 42px;
-      position: relative;
-      z-index: 1;
-
-      .hex-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: -1;
-        @media (prefers-reduced-motion: no-preference) {
-          transition: var(--transition);
-        }
-      }
-
-      .logo-container {
-        position: relative;
-        z-index: 1;
-        svg {
-          fill: none;
-          user-select: none;
-          @media (prefers-reduced-motion: no-preference) {
-            transition: var(--transition);
-          }
-          polygon {
-            fill: var(--navy);
-          }
-        }
-      }
+      font-family: var(--font-mono);
+      font-size: var(--fz-sm);
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
 
       &:hover,
-      &:focus {
-        outline: 0;
-        transform: translate(-4px, -4px);
-        .hex-container {
-          transform: translate(4px, 3px);
-        }
+      &:focus-visible {
+        color: var(--accent);
       }
     }
   }
@@ -126,18 +88,18 @@ const StyledLinks = styled.div`
     li {
       margin: 0 5px;
       position: relative;
-      counter-increment: item 1;
-      font-size: var(--fz-xs);
+      font-family: var(--font-sans);
+      font-size: var(--fz-sm);
 
       a {
         padding: 10px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: var(--transition);
 
-        &:before {
-          content: '0' counter(item) '.';
-          margin-right: 5px;
-          color: var(--green);
-          font-size: var(--fz-xxs);
-          text-align: right;
+        &:hover,
+        &:focus-visible {
+          color: var(--text);
         }
       }
     }
@@ -185,21 +147,11 @@ const Nav = ({ isHome }) => {
     <div className="logo" tabIndex="-1">
       {isHome ? (
         <a href="/" aria-label="home">
-          <div className="hex-container">
-            <IconHex />
-          </div>
-          <div className="logo-container">
-            <IconLogo />
-          </div>
+          shaurya tiwari
         </a>
       ) : (
         <Link to="/" aria-label="home">
-          <div className="hex-container">
-            <IconHex />
-          </div>
-          <div className="logo-container">
-            <IconLogo />
-          </div>
+          shaurya tiwari
         </Link>
       )}
     </div>

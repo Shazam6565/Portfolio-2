@@ -45,8 +45,8 @@ const StyledHamburgerButton = styled.button`
     right: 0;
     width: var(--hamburger-width);
     height: 2px;
-    border-radius: var(--border-radius);
-    background-color: var(--green);
+    border-radius: 0;
+    background-color: var(--text);
     transition-duration: 0.22s;
     transition-property: transform;
     transition-delay: ${props => (props.menuOpen ? `0.12s` : `0s`)};
@@ -63,8 +63,8 @@ const StyledHamburgerButton = styled.button`
       right: 0;
       width: var(--hamburger-width);
       height: 2px;
-      border-radius: 4px;
-      background-color: var(--green);
+      border-radius: 0;
+      background-color: var(--text);
       transition-timing-function: ease;
       transition-duration: 0.15s;
       transition-property: transform;
@@ -98,8 +98,8 @@ const StyledSidebar = styled.aside`
     width: min(75vw, 400px);
     height: 100vh;
     outline: 0;
-    background-color: var(--light-navy);
-    box-shadow: -10px 0px 30px -15px var(--navy-shadow);
+    background-color: var(--bg);
+    border-left: 1px solid var(--line);
     z-index: 9;
     transform: translateX(${props => (props.menuOpen ? 0 : 100)}vw);
     visibility: ${props => (props.menuOpen ? 'visible' : 'hidden')};
@@ -110,8 +110,8 @@ const StyledSidebar = styled.aside`
     ${({ theme }) => theme.mixins.flexBetween};
     width: 100%;
     flex-direction: column;
-    color: var(--lightest-slate);
-    font-family: var(--font-mono);
+    color: var(--text);
+    font-family: var(--font-sans);
     text-align: center;
   }
 
@@ -124,26 +124,25 @@ const StyledSidebar = styled.aside`
     li {
       position: relative;
       margin: 0 auto 20px;
-      counter-increment: item 1;
       font-size: clamp(var(--fz-sm), 4vw, var(--fz-lg));
 
       @media (max-width: 600px) {
         margin: 0 auto 10px;
       }
-
-      &:before {
-        content: '0' counter(item) '.';
-        display: block;
-        margin-bottom: 5px;
-        color: var(--green);
-        font-size: var(--fz-sm);
-      }
     }
 
     a {
-      ${({ theme }) => theme.mixins.link};
+      display: inline-block;
       width: 100%;
-      padding: 3px 20px 20px;
+      padding: 12px 20px;
+      color: var(--text);
+      text-decoration: none;
+      transition: var(--transition);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--accent);
+      }
     }
   }
 
@@ -246,7 +245,8 @@ const Menu = () => {
           onClick={toggleMenu}
           menuOpen={menuOpen}
           ref={buttonRef}
-          aria-label="Menu">
+          aria-label="Menu"
+        >
           <div className="ham-box">
             <div className="ham-box-inner" />
           </div>

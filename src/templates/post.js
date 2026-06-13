@@ -7,16 +7,41 @@ import styled from 'styled-components';
 import { Layout } from '@components';
 
 const StyledPostContainer = styled.main`
-  max-width: 1000px;
+  max-width: 720px;
 `;
 const StyledPostHeader = styled.header`
-  margin-bottom: 50px;
-  .tag {
-    margin-right: 10px;
+  margin-bottom: 40px;
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(24px, 5vw, 32px);
+  }
+
+  .meta {
+    margin: 0;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+
+    a {
+      color: var(--text-muted);
+
+      &:hover,
+      &:focus {
+        color: var(--text);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+    }
+
+    .tag {
+      margin-right: 10px;
+    }
   }
 `;
 const StyledPostContent = styled.div`
-  margin-bottom: 100px;
+  margin-bottom: 60px;
+
   h1,
   h2,
   h3,
@@ -28,17 +53,22 @@ const StyledPostContent = styled.div`
 
   p {
     margin: 1em 0;
-    line-height: 1.5;
-    color: var(--light-slate);
+    line-height: 1.6;
+    color: var(--text-secondary);
   }
 
   a {
     ${({ theme }) => theme.mixins.inlineLink};
   }
 
+  img {
+    border: 1px solid var(--line);
+    filter: grayscale(100%);
+  }
+
   code {
-    background-color: var(--lightest-navy);
-    color: var(--lightest-slate);
+    background-color: var(--surface);
+    color: var(--text);
     border-radius: var(--border-radius);
     font-size: var(--fz-sm);
     padding: 0.2em 0.4em;
@@ -78,8 +108,8 @@ const PostTemplate = ({ data, location }) => {
         </span>
 
         <StyledPostHeader>
-          <h1 className="medium-heading">{title}</h1>
-          <p className="subtitle">
+          <h1>{title}</h1>
+          <p className="meta">
             <time>
               {new Date(date).toLocaleDateString('en-US', {
                 year: 'numeric',
@@ -112,7 +142,7 @@ PostTemplate.propTypes = {
 export default PostTemplate;
 
 export const pageQuery = graphql`
-  query($path: String!) {
+  query ($path: String!) {
     markdownRemark(frontmatter: { slug: { eq: $path } }) {
       html
       frontmatter {

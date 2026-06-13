@@ -1,50 +1,45 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { Layout } from '@components';
 import { IconGitHub, IconLinkedin, IconExternal } from '@components/icons';
 
-const StyledResumeContainer = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 180px 20px;
-  color: var(--slate);
-  font-family: var(--font-sans);
+const StyledResumeContainer = styled.main`
+  color: var(--text-secondary);
 
   header {
     margin-bottom: 50px;
-    text-align: center;
 
     h1 {
-      font-size: clamp(40px, 5vw, 60px);
-      font-weight: 600;
-      color: var(--lightest-slate);
-      line-height: 1.1;
-      margin-bottom: 10px;
+      margin: 0 0 8px;
+      font-size: var(--fz-heading);
+      color: var(--text);
+      line-height: 1.2;
     }
 
     .subtitle {
-      color: var(--green);
+      margin: 0 0 16px;
+      color: var(--text-muted);
       font-family: var(--font-mono);
-      font-size: var(--fz-md);
-      margin-bottom: 20px;
+      font-size: var(--fz-sm);
     }
 
     .contact-links {
       display: flex;
-      justify-content: center;
-      gap: 20px;
+      flex-wrap: wrap;
+      gap: 8px 20px;
       font-family: var(--font-mono);
-      font-size: var(--fz-sm);
+      font-size: var(--fz-xs);
 
       a {
-        color: var(--lightest-slate);
-        &:hover {
-          color: var(--green);
-        }
+        ${({ theme }) => theme.mixins.inlineLink};
+        display: inline-flex;
+        align-items: center;
+        color: var(--text);
+
         svg {
-          width: 20px;
-          height: 20px;
+          width: 14px;
+          height: 14px;
           margin-right: 5px;
         }
       }
@@ -52,44 +47,46 @@ const StyledResumeContainer = styled.div`
   }
 
   section {
-    margin-bottom: 30px;
+    margin: 0 0 40px;
+    padding: 0;
+    max-width: none;
 
     h2 {
-      font-size: var(--fz-heading);
-      margin-bottom: 20px;
-      color: var(--lightest-slate);
-      &:after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 1px;
-        background-color: var(--lightest-navy);
-        margin-top: 10px;
-      }
+      margin: 0 0 16px;
+      padding-bottom: 8px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: var(--fz-xs);
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--line);
     }
   }
 
   .experience-item,
   .project-item {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 
     .header-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
 
       h3 {
-        color: var(--lightest-slate);
-        font-size: var(--fz-xl);
-        font-weight: 500;
+        color: var(--text);
+        font-size: var(--fz-md);
+        font-weight: 600;
         margin: 0;
       }
 
       .date {
-        color: var(--light-slate);
+        color: var(--text-muted);
         font-family: var(--font-mono);
         font-size: var(--fz-xs);
+        white-space: nowrap;
+        margin-left: 16px;
       }
     }
 
@@ -97,34 +94,41 @@ const StyledResumeContainer = styled.div`
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
 
       .position {
-        color: var(--green);
+        color: var(--text-secondary);
         font-family: var(--font-mono);
         font-size: var(--fz-sm);
       }
 
-      .location {
-        font-style: italic;
+      .location,
+      .date {
+        color: var(--text-muted);
+        font-family: var(--font-mono);
         font-size: var(--fz-xs);
       }
+    }
+
+    p {
+      font-size: var(--fz-sm);
     }
 
     ul {
       padding: 0;
       margin: 0;
       list-style: none;
+      font-size: var(--fz-sm);
 
       li {
         position: relative;
-        padding-left: 20px;
-        margin-bottom: 5px;
+        padding-left: 16px;
+        margin-bottom: 4px;
         &:before {
-          content: '▹';
+          content: '–';
           position: absolute;
           left: 0;
-          color: var(--green);
+          color: var(--text-muted);
         }
       }
     }
@@ -132,26 +136,33 @@ const StyledResumeContainer = styled.div`
 
   .skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
 
     .skill-category {
       h4 {
-        color: var(--lightest-slate);
-        margin-bottom: 10px;
-        font-size: var(--fz-lg);
+        color: var(--text);
+        margin: 0 0 6px;
+        font-size: var(--fz-sm);
+        font-weight: 600;
       }
       ul {
         list-style: none;
         padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+
         li {
+          color: var(--text-secondary);
           font-family: var(--font-mono);
           font-size: var(--fz-xs);
-          margin-bottom: 5px;
-          &:before {
-            content: '▹';
-            color: var(--green);
-            margin-right: 5px;
+          margin: 0;
+
+          &:not(:last-child):after {
+            content: '·';
+            margin: 0 6px;
+            color: var(--text-muted);
           }
         }
       }
@@ -161,24 +172,38 @@ const StyledResumeContainer = styled.div`
   table.impact-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 4px;
 
     th,
     td {
-      text-align: center;
-      padding: 25px;
-      border: 2px solid var(--light-navy);
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
       font-size: var(--fz-sm);
     }
 
+    th:first-child,
+    td:first-child {
+      padding-left: 0;
+    }
+
+    th:last-child,
+    td:last-child {
+      padding-right: 0;
+    }
+
     th {
-      color: var(--green);
+      color: var(--text-muted);
       font-family: var(--font-mono);
-      background-color: var(--light-navy);
+      font-size: var(--fz-xs);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
 
     td {
-      color: var(--light-slate);
+      color: var(--text-secondary);
+      vertical-align: top;
     }
 
     @media (max-width: 900px) {
@@ -188,30 +213,9 @@ const StyledResumeContainer = styled.div`
   }
 `;
 
-const scrollAnimation = keyframes`
-  0% { transform: translateY(0); opacity: 0.5; }
-  50% { transform: translateY(6px); opacity: 1; }
-  100% { transform: translateY(0); opacity: 0.5; }
-`;
-
-const ScrollIndicator = styled.div`
-  margin-top: 40px;
-  display: flex;
-  justify-content: center;
-  animation: ${scrollAnimation} 2s infinite ease-in-out;
-
-  span {
-    width: 20px;
-    height: 20px;
-    border-right: 2px solid var(--green);
-    border-bottom: 2px solid var(--green);
-    transform: rotate(45deg);
-  }
-`;
-
 const ResumeButton = styled.a`
-  ${({ theme }) => theme.mixins.bigButton};
-  margin-top: 50px;
+  ${({ theme }) => theme.mixins.button};
+  margin-top: 20px;
   display: inline-block;
 `;
 
@@ -234,24 +238,21 @@ const ResumePage = ({ location }) => (
           </a>
         </div>
         <ResumeButton href="/resume.pdf" target="_blank" rel="noopener noreferrer">
-            Download / View Resume
+          Download / View Resume
         </ResumeButton>
-        <ScrollIndicator>
-          <span />
-        </ScrollIndicator>
       </header>
 
       <section>
         <h2>Summary</h2>
         <p>
-            AI Software Engineer specializing in production-grade agentic systems and data retrieval
-            platforms working as a forward deployed engineer for 9+ verticals at U.S. News & World
-            Report. Expertise in Django backends, LangChain/LangGraph orchestration, vector store
-            usage (OpenSearch/FAISS), and streaming APIs. Proven ability to ship reliable AI
-            integrated products with industry grade guardrail infrastructure support (legal
-            compliance), from site search to B2B data analysis agentic tool with real time graph and
-            csv generations, performing in ambiguous environments with strong cross-functional
-            collaboration across multiple verticals.
+          AI Software Engineer specializing in production-grade agentic systems and data retrieval
+          platforms working as a forward deployed engineer for 9+ verticals at U.S. News & World
+          Report. Expertise in Django backends, LangChain/LangGraph orchestration, vector store
+          usage (OpenSearch/FAISS), and streaming APIs. Proven ability to ship reliable AI
+          integrated products with industry grade guardrail infrastructure support (legal
+          compliance), from site search to B2B data analysis agentic tool with real time graph and
+          csv generations, performing in ambiguous environments with strong cross-functional
+          collaboration across multiple verticals.
         </p>
       </section>
 
@@ -269,19 +270,18 @@ const ResumePage = ({ location }) => (
           </div>
           <ul>
             <li>
-                Architected ByteSage Django backend driving AI products with LangGraph agent
-                workflows
+              Architected ByteSage Django backend driving AI products with LangGraph agent workflows
             </li>
             <li>
-                Implement RAG pipelines using OpenSearch/FAISS for semantic retrieval with metadata
-                filtering
+              Implement RAG pipelines using OpenSearch/FAISS for semantic retrieval with metadata
+              filtering
             </li>
             <li>
-                Deploy streaming endpoints; harden reliability across dev/sandbox/UAT/prod
-                environments
+              Deploy streaming endpoints; harden reliability across dev/sandbox/UAT/prod
+              environments
             </li>
             <li>
-                Build guardrails and conditional routing for production-safe agentic tool execution
+              Build guardrails and conditional routing for production-safe agentic tool execution
             </li>
           </ul>
         </div>
@@ -297,12 +297,12 @@ const ResumePage = ({ location }) => (
           </div>
           <ul>
             <li>
-                Built Python/Airflow pipelines processing 1M+ marine data points into PostgreSQL
-                (10+ TB)
+              Built Python/Airflow pipelines processing 1M+ marine data points into PostgreSQL (10+
+              TB)
             </li>
             <li>
-                Developed Django REST APIs serving 2M+ users/researchers with the marine data
-                acquisition dashboards
+              Developed Django REST APIs serving 2M+ users/researchers with the marine data
+              acquisition dashboards
             </li>
           </ul>
         </div>
@@ -318,11 +318,11 @@ const ResumePage = ({ location }) => (
           </div>
           <ul>
             <li>
-                Engineered PyTorch/TensorFlow models achieving 0.92 F1-score for anomaly detection
+              Engineered PyTorch/TensorFlow models achieving 0.92 F1-score for anomaly detection
             </li>
             <li>
-                Reduced inference time 40% via custom CUDA kernels; boosted throughput 30% with GPU
-                clustering
+              Reduced inference time 40% via custom CUDA kernels; boosted throughput 30% with GPU
+              clustering
             </li>
           </ul>
         </div>
@@ -338,12 +338,11 @@ const ResumePage = ({ location }) => (
           </div>
           <ul>
             <li>
-                Maintained CI/CD pipelines (Jenkins, Docker, SonarQube); cut MTTR 80% with AWS
-                CloudWatch
+              Maintained CI/CD pipelines (Jenkins, Docker, SonarQube); cut MTTR 80% with AWS
+              CloudWatch
             </li>
             <li>
-                Automated infrastructure provisioning with Terraform, reducing deployment time by
-                60%
+              Automated infrastructure provisioning with Terraform, reducing deployment time by 60%
             </li>
           </ul>
         </div>
@@ -359,12 +358,12 @@ const ResumePage = ({ location }) => (
           </div>
           <ul>
             <li>
-                It was here where I was introduced to multiple CMS systems like Wordpress, Drupal,
-                Magento, and Shopify.
+              It was here where I was introduced to multiple CMS systems like Wordpress, Drupal,
+              Magento, and Shopify.
             </li>
             <li>
-                Implemented multiple extension based solutions for client sites supporting increase
-                in traffic and clicks.
+              Implemented multiple extension based solutions for client sites supporting increase in
+              traffic and clicks.
             </li>
           </ul>
         </div>
@@ -377,8 +376,8 @@ const ResumePage = ({ location }) => (
             <h3>Cerebral Valley Agent Hackathon - Agent IDE Mind Map (Nov 2025)</h3>
           </div>
           <p>
-              Using Antigravity IDE’s reasoning logs to generate mind map for tracking the
-              development process with AI agents.
+            Using Antigravity IDE’s reasoning logs to generate mind map for tracking the development
+            process with AI agents.
           </p>
         </div>
         <div className="project-item">
@@ -386,8 +385,8 @@ const ResumePage = ({ location }) => (
             <h3>Portfolio AI Chatbot (May 2024)</h3>
           </div>
           <p>
-              RAG assistant with Llama 3, Chroma vector DB, LangChain for conversational resume
-              queries.
+            RAG assistant with Llama 3, Chroma vector DB, LangChain for conversational resume
+            queries.
           </p>
         </div>
         <div className="project-item">
@@ -395,7 +394,7 @@ const ResumePage = ({ location }) => (
             <h3>Transformer from Scratch (Feb–Apr 2024)</h3>
           </div>
           <p>
-              Built text completion model implementing self-attention; tracked perplexity dynamics.
+            Built text completion model implementing self-attention; tracked perplexity dynamics.
           </p>
         </div>
         <div className="project-item">
@@ -496,7 +495,7 @@ const ResumePage = ({ location }) => (
             </tr>
             <tr>
               <td>
-                  Improved system observability and reduced mean time to detect and report outages
+                Improved system observability and reduced mean time to detect and report outages
               </td>
               <td>New Relic, Slackbots, ByteSage</td>
               <td>U.S. News (Present)</td>

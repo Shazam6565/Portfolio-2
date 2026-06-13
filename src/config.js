@@ -38,8 +38,12 @@ module.exports = {
       url: '/#projects',
     },
     {
-      name: 'Project Archive',
+      name: 'Archive',
       url: '/archive',
+    },
+    {
+      name: 'Writing',
+      url: '/pensieve',
     },
     {
       name: 'Contact',
@@ -52,9 +56,9 @@ module.exports = {
   ],
 
   colors: {
-    green: '#64ffda',
-    navy: '#0a192f',
-    darkNavy: '#020c1b',
+    green: '#111111',
+    navy: '#ffffff',
+    darkNavy: '#ffffff',
   },
 
   srConfig: (delay = 200, viewFactor = 0.25) => ({

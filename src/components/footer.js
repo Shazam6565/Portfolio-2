@@ -1,133 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled from 'styled-components';
-import { Icon } from '@components/icons';
 import { socialMedia } from '@config';
 
 const StyledFooter = styled.footer`
   ${({ theme }) => theme.mixins.flexCenter};
   flex-direction: column;
-  height: auto;
-  min-height: 70px;
-  padding: 15px;
+  padding: 24px;
+  border-top: 1px solid var(--line);
   text-align: center;
-`;
+  font-family: var(--font-mono);
+  font-size: var(--fz-xs);
+  color: var(--text-muted);
 
-const StyledSocialLinks = styled.div`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: block;
-    width: 100%;
-    max-width: 270px;
-    margin: 0 auto 10px;
-    color: var(--light-slate);
-  }
-
-  ul {
-    ${({ theme }) => theme.mixins.flexBetween};
-    padding: 0;
-    margin: 0;
-    list-style: none;
+  .social-links {
+    margin-bottom: 8px;
 
     a {
-      padding: 10px;
-      svg {
-        width: 20px;
-        height: 20px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: var(--transition);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--text);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+    }
+
+    .separator {
+      margin: 0 6px;
+      color: var(--text-muted);
+    }
+  }
+
+  .credit {
+    line-height: 1.6;
+    color: var(--text-muted);
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: var(--transition);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--text);
+        text-decoration: underline;
+        text-underline-offset: 3px;
       }
     }
   }
 `;
 
-const StyledCredit = styled.div`
-  color: var(--light-slate);
-  font-family: var(--font-mono);
-  font-size: var(--fz-xxs);
-  line-height: 1;
-
-  a {
-    padding: 10px;
-  }
-
-  .github-stats {
-    margin-top: 10px;
-
-    & > span {
-      display: inline-flex;
-      align-items: center;
-      margin: 0 7px;
-    }
-    svg {
-      display: inline-block;
-      margin-right: 5px;
-      width: 14px;
-      height: 14px;
-    }
-  }
-`;
-
-const Footer = () => {
-  const [githubInfo, setGitHubInfo] = useState({
-    stars: null,
-    forks: null,
-  });
-
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      return;
-    }
-    fetch('https://api.github.com/repos/bchiang7/v4')
-      .then(response => response.json())
-      .then(json => {
-        const { stargazers_count, forks_count } = json;
-        setGitHubInfo({
-          stars: stargazers_count,
-          forks: forks_count,
-        });
-      })
-      .catch(e => console.error(e));
-  }, []);
-
-  return (
-    <StyledFooter>
-      <StyledSocialLinks>
-        <ul>
-          {socialMedia &&
-            socialMedia.map(({ name, url }, i) => (
-              <li key={i}>
-                <a href={url} aria-label={name}>
-                  <Icon name={name} />
-                </a>
-              </li>
-            ))}
-        </ul>
-      </StyledSocialLinks>
-
-      <StyledCredit tabindex="-1">
-        <a href="https://github.com/shazam6565">
-          <div>Designed by Brittany &amp; Built by Shaurya Tiwari</div>
-
-          {githubInfo.stars && githubInfo.forks && (
-            <div className="github-stats">
-              <span>
-                <Icon name="Star" />
-                <span>{githubInfo.stars.toLocaleString()}</span>
+const Footer = () => (
+  <StyledFooter>
+    <div className="social-links">
+      {socialMedia &&
+        socialMedia.map(({ name, url }, i) => (
+          <React.Fragment key={name}>
+            {i > 0 && (
+              <span className="separator" aria-hidden="true">
+                ·
               </span>
-              <span>
-                <Icon name="Fork" />
-                <span>{githubInfo.forks.toLocaleString()}</span>
-              </span>
-            </div>
-          )}
-        </a>
-      </StyledCredit>
-    </StyledFooter>
-  );
-};
+            )}
+            <a href={url} target="_blank" rel="noreferrer">
+              {name}
+            </a>
+          </React.Fragment>
+        ))}
+    </div>
 
-Footer.propTypes = {
-  githubInfo: PropTypes.object,
-};
+    <div className="credit">
+      © Shaurya Tiwari · Design adapted from{' '}
+      <a href="https://github.com/bchiang7/v4" target="_blank" rel="noreferrer">
+        Brittany Chiang
+      </a>
+    </div>
+  </StyledFooter>
+);
 
 export default Footer;
