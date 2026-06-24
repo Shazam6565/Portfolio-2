@@ -1,25 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useStaticQuery, graphql } from 'gatsby';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Link, navigate, useStaticQuery, graphql } from 'gatsby';
+import { StaticImage } from 'gatsby-plugin-image';
 import styled from 'styled-components';
 import { email, socialMedia } from '@config';
 
 /* ------------------------------------------------------------------ */
-/* Layout of the node-link graph (percent coordinates of the stage)    */
+/* Helpers                                                             */
 /* ------------------------------------------------------------------ */
-const CENTER = { x: 50, y: 50 };
-const NODES = [
-  { id: 'about', label: 'About', num: 'I', x: 50, y: 15 },
-  { id: 'experience', label: 'Experience', num: 'II', x: 82, y: 33 },
-  { id: 'projects', label: 'Work', num: 'III', x: 82, y: 67 },
-  { id: 'writing', label: 'Writing', num: 'IV', x: 50, y: 85 },
-  { id: 'contact', label: 'Contact', num: 'V', x: 18, y: 67 },
-  { id: 'assistant', label: 'AI Assistant', num: 'VI', x: 18, y: 33 },
-];
+const ext = url => ({ href: url, target: '_blank', rel: 'noopener noreferrer' });
+const rad = deg => (deg * Math.PI) / 180;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const shortCompany = c => c.split(' & ')[0].split(' at ')[0].split(',')[0].trim();
+const shortText = (t, n) => (t.length > n ? `${t.slice(0, n).trim()}…` : t);
 
 /* ------------------------------------------------------------------ */
 /* Styled                                                              */
 /* ------------------------------------------------------------------ */
-const Stage = styled.div`
+const Wrap = styled.div`
   position: relative;
   width: 100%;
   height: 100vh;
@@ -30,7 +27,7 @@ const Stage = styled.div`
     height: auto;
     min-height: 0;
     overflow: visible;
-    padding: 92px 22px 56px;
+    padding: 92px 22px 64px;
   }
 `;
 
@@ -45,44 +42,62 @@ const Edges = styled.svg`
   line {
     stroke: var(--line);
     stroke-width: 1;
-    transition: stroke 0.18s ease, opacity 0.18s ease;
+    transition: x1 0.4s ease, y1 0.4s ease, x2 0.4s ease, y2 0.4s ease, stroke 0.25s ease,
+      opacity 0.25s ease;
   }
-  line.active {
+  line.lit {
     stroke: var(--text);
   }
   line.dim {
-    opacity: 0.4;
+    opacity: 0.28;
+  }
+  line.sub {
+    stroke: var(--text-muted);
+    animation: edgeIn 0.35s ease both;
   }
   circle {
     fill: var(--text-muted);
+    transition: cx 0.4s ease, cy 0.4s ease, opacity 0.25s ease;
   }
 
-  @media (max-width: 760px) {
-    display: none;
+  @keyframes edgeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
-const Center = styled.div`
+const nodeBase = `
   position: absolute;
-  left: 50%;
-  top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
-  text-align: center;
+  transition: left 0.4s ease, top 0.4s ease, opacity 0.3s ease;
   background: var(--bg);
-  padding: 10px 18px;
+  border: 0;
+  color: var(--text);
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+`;
+
+const Hub = styled.button`
+  ${nodeBase};
+  z-index: 4;
+  padding: 8px 16px;
 
   .name {
     margin: 0;
-    font-size: clamp(32px, 4.6vw, 52px);
     font-weight: 500;
+    font-size: clamp(28px, 3.6vw, 46px);
     line-height: 1.04;
     color: var(--text);
   }
   .rule {
-    width: 44px;
+    width: 40px;
     height: 1px;
-    margin: 13px auto;
+    margin: 12px auto;
     background: var(--text-muted);
   }
   .role {
@@ -92,43 +107,21 @@ const Center = styled.div`
     text-transform: uppercase;
     color: var(--text-muted);
   }
-  .hint {
-    margin-top: 10px;
-    font-style: italic;
-    font-size: var(--fz-sm);
-    color: var(--text-muted);
-  }
-
-  @media (max-width: 760px) {
-    position: static;
-    transform: none;
-    text-align: left;
-    padding: 0;
-    margin-bottom: 26px;
-
-    .rule {
-      margin: 13px 0;
-    }
-    .hint {
-      display: none;
-    }
-  }
 `;
 
-const NodeButton = styled.button`
-  position: absolute;
-  transform: translate(-50%, -50%);
-  z-index: 2;
+const Primary = styled.button`
+  ${nodeBase};
+  z-index: 3;
+  padding: 7px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 8px 12px;
-  background: var(--bg);
-  border: 0;
-  color: var(--text);
-  cursor: pointer;
   white-space: nowrap;
+
+  &.dim {
+    opacity: 0.32;
+  }
 
   .num {
     font-family: var(--font-mono);
@@ -144,105 +137,126 @@ const NodeButton = styled.button`
 
   &:hover .label,
   &:focus-visible .label,
-  &[aria-expanded='true'] .label {
+  &.open .label {
     text-decoration: underline;
     text-underline-offset: 4px;
   }
-
-  @media (max-width: 760px) {
-    position: static !important;
-    transform: none;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: baseline;
-    gap: 12px;
-    width: 100%;
-    padding: 16px 2px;
-    border-bottom: 1px solid var(--line);
-
-    &:first-of-type {
-      border-top: 1px solid var(--line);
-    }
-    .label {
-      font-size: var(--fz-xl);
-    }
-  }
 `;
 
-const Caption = styled.p`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 18px;
-  margin: 0;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  z-index: 2;
+const Sub = styled.button`
+  ${nodeBase};
+  z-index: 3;
+  padding: 6px 9px;
+  max-width: 150px;
+  animation: subIn 0.32s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 
-  @media (max-width: 760px) {
-    position: static;
-    margin-top: 36px;
+  .sub-label {
+    font-size: var(--fz-sm);
+    line-height: 1.2;
+    color: var(--text);
+    transition: var(--transition);
   }
-`;
+  .sub-meta {
+    margin-top: 2px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
 
-const Backdrop = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  background: var(--bg);
-  opacity: 0.72;
-  backdrop-filter: blur(2px);
-  animation: fade 0.18s ease;
+  &:hover .sub-label,
+  &:focus-visible .sub-label,
+  &.active .sub-label {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  &.active .sub-label {
+    font-weight: 600;
+  }
 
-  @keyframes fade {
+  @keyframes subIn {
     from {
       opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
     }
     to {
-      opacity: 0.72;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
   }
 `;
 
-const Sheet = styled.div`
+const Portrait = styled.div`
+  position: absolute;
+  left: 36px;
+  bottom: 34px;
+  width: 132px;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .frame {
+    border: 1px solid var(--line);
+    line-height: 0;
+  }
+  img {
+    /* photo is already black & white — leave it untouched */
+  }
+  figcaption {
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+`;
+
+const Pane = styled.aside`
   position: fixed;
-  z-index: 31;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(660px, 92vw);
-  max-height: 82vh;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  width: clamp(340px, 38vw, 560px);
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  border: 1px solid var(--text);
+  border-left: 1px solid var(--text);
+  transform: translateX(100%);
+  transition: transform 0.38s cubic-bezier(0.2, 0.7, 0.3, 1);
 
-  .sheet__head {
+  &.open {
+    transform: translateX(0);
+  }
+
+  .pane__head {
     flex: none;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
-    padding: 22px 28px 16px;
+    padding: 26px 30px 18px;
     border-bottom: 1px solid var(--line);
   }
-  .sheet__chapter {
+  .pane__chapter {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
-  .sheet__title {
-    margin: 5px 0 0;
+  .pane__title {
+    margin: 6px 0 0;
     font-size: var(--fz-xxl);
     font-weight: 500;
     color: var(--text);
   }
-  .sheet__close {
+  .pane__close {
     flex: none;
     margin-top: 2px;
     background: transparent;
@@ -258,14 +272,32 @@ const Sheet = styled.div`
       color: var(--text);
     }
   }
-  .sheet__body {
+  .pane__body {
     overflow-y: auto;
-    padding: 20px 28px 28px;
+    padding: 22px 30px 32px;
     font-size: var(--fz-md);
     color: var(--text-secondary);
 
     p {
       margin: 0 0 14px;
+    }
+    .rich ul,
+    .rich ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .rich li {
+      position: relative;
+      list-style: none;
+      padding-left: 18px;
+      margin-bottom: 7px;
+    }
+    .rich li:before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
     }
     a {
       color: var(--text);
@@ -280,27 +312,20 @@ const Sheet = styled.div`
   }
 
   @media (max-width: 760px) {
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    transform: none;
-    width: auto;
-    max-height: none;
-    border: 0;
+    width: 100%;
+    border-left: 0;
   }
 `;
 
-const InlineLinks = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 6px;
-  font-size: var(--fz-sm);
+const Meta = styled.p`
+  font-family: var(--font-mono);
+  font-size: var(--fz-xs);
+  color: var(--text-muted) !important;
+  margin: 0 0 14px !important;
 `;
 
-const TechLine = styled.p`
-  margin: 8px 0 0 !important;
+const Tech = styled.p`
+  margin: 10px 0 0 !important;
   font-family: var(--font-mono);
   font-size: var(--fz-xs);
   color: var(--text-muted) !important;
@@ -311,73 +336,99 @@ const TechLine = styled.p`
   }
 `;
 
-const Acc = styled.details`
-  border-top: 1px solid var(--line);
+const Links = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 14px;
+  font-size: var(--fz-sm);
+`;
 
-  &:last-of-type {
-    border-bottom: 1px solid var(--line);
+const ProfilePhoto = styled.div`
+  width: 168px;
+  border: 1px solid var(--line);
+  line-height: 0;
+  margin: 0 0 18px;
+`;
+
+/* ---- mobile fallback ---- */
+const MobileNav = styled.div`
+  display: none;
+
+  @media (max-width: 760px) {
+    display: block;
   }
 
+  .m-hub h1 {
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(40px, 11vw, 56px);
+    line-height: 1.02;
+  }
+  .m-role {
+    margin: 12px 0 28px;
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .m-portrait {
+    width: 140px;
+    border: 1px solid var(--line);
+    line-height: 0;
+    margin: 0 0 28px;
+  }
+  details {
+    border-top: 1px solid var(--line);
+    &:last-of-type {
+      border-bottom: 1px solid var(--line);
+    }
+  }
   summary {
     list-style: none;
     cursor: pointer;
     display: flex;
-    justify-content: space-between;
     align-items: baseline;
-    gap: 14px;
-    padding: 13px 0;
+    gap: 12px;
+    padding: 16px 2px;
+    font-size: var(--fz-xl);
+    font-style: italic;
+    color: var(--text);
   }
   summary::-webkit-details-marker {
     display: none;
   }
-  summary::after {
-    content: '+';
-    flex: none;
+  summary .num {
     font-family: var(--font-mono);
+    font-size: 11px;
+    font-style: normal;
+    letter-spacing: 0.12em;
     color: var(--text-muted);
   }
-  &[open] summary::after {
-    content: '–';
+  .m-subs {
+    padding: 0 0 14px 2px;
   }
-  .acc__title {
+  .m-sub {
+    display: block;
+    background: none;
+    border: 0;
+    text-align: left;
+    padding: 7px 0;
     color: var(--text);
     font-size: var(--fz-md);
-  }
-  .acc__meta {
-    flex: none;
-    font-family: var(--font-mono);
-    font-size: var(--fz-xs);
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-  .acc__body {
-    padding: 0 0 16px;
-    font-size: var(--fz-sm);
-
-    ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    li {
-      position: relative;
-      padding-left: 18px;
-      margin-bottom: 6px;
-    }
-    li:before {
-      content: '–';
-      position: absolute;
-      left: 0;
-      color: var(--text-muted);
-    }
+    text-decoration: none;
+    cursor: pointer;
   }
 `;
 
-const ChapterLink = styled(Link)`
-  display: inline-block;
-  margin-top: 18px;
-  font-style: italic;
-  color: var(--text) !important;
+const DesktopGraph = styled.div`
+  position: absolute;
+  inset: 0;
+
+  @media (max-width: 760px) {
+    display: none;
+  }
 `;
 
 /* ------------------------------------------------------------------ */
@@ -439,285 +490,500 @@ const GraphHome = () => {
     }
   `);
 
-  const [active, setActive] = useState(null);
-  const close = useCallback(() => setActive(null), []);
+  const jobs = data.jobs.edges.map(e => e.node);
+  const featured = data.featured.edges.map(e => e.node);
+  const posts = data.posts.edges.map(e => e.node);
+  const social = name => socialMedia.find(s => s.name.toLowerCase() === name.toLowerCase());
+
+  /* ---- content builders ---- */
+  const profilePhoto = (
+    <ProfilePhoto>
+      <StaticImage
+        src="../../images/hero.png"
+        alt="Shaurya Tiwari"
+        width={336}
+        placeholder="blurred"
+        formats={['auto', 'webp', 'avif']}
+      />
+    </ProfilePhoto>
+  );
+
+  const groups = useMemo(() => {
+    const jobSubs = jobs.map((n, i) => ({
+      id: `job-${i}`,
+      label: shortCompany(n.frontmatter.company),
+      title: n.frontmatter.title,
+      body: (
+        <>
+          <Meta>
+            {n.frontmatter.company} · {n.frontmatter.range}
+          </Meta>
+          <div className="rich" dangerouslySetInnerHTML={{ __html: n.html }} />
+          {n.frontmatter.url && (
+            <Links>
+              <a {...ext(n.frontmatter.url)}>{shortCompany(n.frontmatter.company)} ↗</a>
+            </Links>
+          )}
+        </>
+      ),
+    }));
+
+    const projSubs = featured.map((n, i) => ({
+      id: `proj-${i}`,
+      label: shortText(n.frontmatter.title, 16),
+      title: n.frontmatter.title,
+      body: (
+        <>
+          <div className="rich" dangerouslySetInnerHTML={{ __html: n.html }} />
+          {n.frontmatter.tech && n.frontmatter.tech.length > 0 && (
+            <Tech>
+              {n.frontmatter.tech.map(t => (
+                <span key={t}>{t}</span>
+              ))}
+            </Tech>
+          )}
+          <Links>
+            {n.frontmatter.external && <a {...ext(n.frontmatter.external)}>Live ↗</a>}
+            {n.frontmatter.github && <a {...ext(n.frontmatter.github)}>Code ↗</a>}
+          </Links>
+        </>
+      ),
+    }));
+    projSubs.push({ id: 'archive', label: 'Archive →', to: '/archive' });
+
+    const postSubs = posts.map((n, i) => ({
+      id: `post-${i}`,
+      label: shortText(n.frontmatter.title, 20),
+      title: n.frontmatter.title,
+      body: (
+        <>
+          <Meta>
+            {new Date(n.frontmatter.date).toLocaleDateString()}
+            {n.frontmatter.tags && n.frontmatter.tags.length
+              ? ` · ${n.frontmatter.tags.map(t => `#${t}`).join(' ')}`
+              : ''}
+          </Meta>
+          <p>
+            <Link to={n.frontmatter.slug}>Read the full piece →</Link>
+          </p>
+        </>
+      ),
+    }));
+    if (postSubs.length === 0) {
+      postSubs.push({
+        id: 'soon',
+        label: 'Notes',
+        title: 'Writing',
+        body: <p>Notes and write-ups, coming soon.</p>,
+      });
+    }
+    postSubs.push({ id: 'all-writing', label: 'All writing →', to: '/pensieve' });
+
+    return [
+      {
+        id: 'about',
+        label: 'About',
+        num: 'I',
+        angle: -90,
+        subs: [
+          {
+            id: 'profile',
+            label: 'Profile',
+            title: 'Profile',
+            body: (
+              <>
+                {profilePhoto}
+                <p>
+                  I&apos;m Shaurya Tiwari, an AI software engineer with a Master&apos;s in Computer
+                  Science from Florida State University. I build production AI infrastructure across
+                  9+ verticals at{' '}
+                  <a {...ext('https://www.usnews.com/')}>U.S. News &amp; World Report</a> — reliable
+                  backends, data-driven AI applications, and systems where correctness and
+                  performance actually matter.
+                </p>
+                <p>
+                  Earlier I worked at a data-product organization, a research department at FSU, a
+                  software consultancy, and a UI/UX studio.
+                </p>
+              </>
+            ),
+          },
+          {
+            id: 'toolbox',
+            label: 'Toolbox',
+            title: 'Toolbox',
+            body: (
+              <>
+                <p>The tools I reach for most often:</p>
+                <Tech>
+                  {[
+                    'Python',
+                    'Django',
+                    'LangChain/LangGraph',
+                    'AWS',
+                    'Docker',
+                    'New Relic',
+                    'Jenkins',
+                  ].map(t => (
+                    <span key={t}>{t}</span>
+                  ))}
+                </Tech>
+              </>
+            ),
+          },
+          {
+            id: 'beyond',
+            label: 'Beyond work',
+            title: 'Beyond work',
+            body: (
+              <p>
+                Off the clock I&apos;m occasionally corny on{' '}
+                <a {...ext('https://www.youtube.com/channel/UC1sfE7YdmxsUdJaOo4vhqVQ')}>
+                  my YouTube livestream
+                </a>
+                , figuring life out with LLMs.
+              </p>
+            ),
+          },
+        ],
+      },
+      { id: 'experience', label: 'Experience', num: 'II', angle: -30, subs: jobSubs },
+      { id: 'projects', label: 'Work / Projects', num: 'III', angle: 30, subs: projSubs },
+      { id: 'writing', label: 'Writing', num: 'IV', angle: 90, subs: postSubs },
+      {
+        id: 'contact',
+        label: 'Contact',
+        num: 'V',
+        angle: 150,
+        subs: [
+          {
+            id: 'email',
+            label: 'Email',
+            title: 'Email',
+            body: (
+              <>
+                <p>The fastest way to reach me.</p>
+                <Links>
+                  <a href={`mailto:${email}`}>{email}</a>
+                </Links>
+              </>
+            ),
+          },
+          {
+            id: 'calendar',
+            label: 'Calendar',
+            title: 'Schedule a call',
+            body: (
+              <>
+                <p>Prefer to talk? Grab a time that works for you.</p>
+                <Links>
+                  <a {...ext('https://calendly.com/vaasutiwari')}>Open my calendar ↗</a>
+                </Links>
+              </>
+            ),
+          },
+          { id: 'linkedin', label: 'LinkedIn', href: social('Linkedin') && social('Linkedin').url },
+          { id: 'github', label: 'GitHub', href: social('GitHub') && social('GitHub').url },
+          { id: 'resume', label: 'Résumé', to: '/resume' },
+        ],
+      },
+      {
+        id: 'assistant',
+        label: 'AI Assistant',
+        num: 'VI',
+        angle: 210,
+        subs: [
+          { id: 'open-chat', label: 'Open chat →', to: '/chat' },
+          {
+            id: 'ai-about',
+            label: 'What it knows',
+            title: 'AI Assistant',
+            body: (
+              <>
+                <p>
+                  I trained a small assistant on my résumé, projects, and career so you can
+                  interview me in natural language — ask about a role, a technology, or how I&apos;d
+                  approach a problem.
+                </p>
+                <Links>
+                  <Link to="/chat">Open the assistant →</Link>
+                </Links>
+              </>
+            ),
+          },
+        ],
+      },
+    ];
+  }, [data]);
+
+  /* ---- state ---- */
+  const [openId, setOpenId] = useState(null);
+  const [activeSub, setActiveSub] = useState(null); // { groupId, sub }
+  const wrapRef = useRef(null);
+  const [size, setSize] = useState({ w: 1280, h: 720 });
 
   useEffect(() => {
-    if (!active) {
+    const el = wrapRef.current;
+    if (!el) {
       return undefined;
     }
+    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const reset = useCallback(() => {
+    setOpenId(null);
+    setActiveSub(null);
+  }, []);
+
+  const closeSub = useCallback(() => setActiveSub(null), []);
+
+  useEffect(() => {
     const onKey = e => {
-      if (e.key === 'Escape') {
-        close();
+      if (e.key !== 'Escape') {
+        return;
+      }
+      if (activeSub) {
+        closeSub();
+      } else if (openId) {
+        setOpenId(null);
       }
     };
     document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [active, close]);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [activeSub, openId, closeSub]);
 
-  const ext = url => ({ href: url, target: '_blank', rel: 'noopener noreferrer' });
-  const social = name => socialMedia.find(s => s.name.toLowerCase() === name.toLowerCase());
-
-  const jobs = data.jobs.edges;
-  const featured = data.featured.edges;
-  const posts = data.posts.edges;
-
-  /* ---- Panel content ---- */
-  const PANELS = {
-    about: {
-      chapter: 'Chapter I',
-      title: 'About',
-      body: (
-        <>
-          <p>
-            I&apos;m Shaurya Tiwari, an AI software engineer with a Master&apos;s in Computer
-            Science from Florida State University. I build production AI infrastructure across 9+
-            verticals at <a {...ext('https://www.usnews.com/')}>U.S. News &amp; World Report</a> —
-            reliable backends, data-driven AI applications, and systems where correctness and
-            performance actually matter.
-          </p>
-          <p>
-            Earlier I worked at a data-product organization, a research department at FSU, a
-            software consultancy, and a UI/UX studio. Off the clock I&apos;m occasionally corny on{' '}
-            <a {...ext('https://www.youtube.com/channel/UC1sfE7YdmxsUdJaOo4vhqVQ')}>
-              my YouTube livestream
-            </a>
-            , figuring life out with LLMs.
-          </p>
-          <TechLine>
-            {[
-              'Python',
-              'Django',
-              'LangChain/LangGraph',
-              'AWS',
-              'Docker',
-              'New Relic',
-              'Jenkins',
-            ].map(t => (
-              <span key={t}>{t}</span>
-            ))}
-          </TechLine>
-        </>
-      ),
-    },
-    experience: {
-      chapter: 'Chapter II',
-      title: 'Experience',
-      body: (
-        <>
-          {jobs.map(({ node }, i) => {
-            const { title, company, range, url } = node.frontmatter;
-            return (
-              <Acc key={i} open={i === 0 || undefined}>
-                <summary>
-                  <span className="acc__title">
-                    {title} · {company}
-                  </span>
-                  <span className="acc__meta">{range}</span>
-                </summary>
-                <div className="acc__body">
-                  <div dangerouslySetInnerHTML={{ __html: node.html }} />
-                  {url && (
-                    <p style={{ margin: '8px 0 0' }}>
-                      <a {...ext(url)}>{company} ↗</a>
-                    </p>
-                  )}
-                </div>
-              </Acc>
-            );
-          })}
-        </>
-      ),
-    },
-    projects: {
-      chapter: 'Chapter III',
-      title: 'Selected Work',
-      body: (
-        <>
-          {featured.map(({ node }, i) => {
-            const { title, tech, github, external } = node.frontmatter;
-            return (
-              <Acc key={i} open={i === 0 || undefined}>
-                <summary>
-                  <span className="acc__title">{title}</span>
-                  <span className="acc__meta">
-                    {external ? 'live' : ''}
-                    {external && github ? ' · ' : ''}
-                    {github ? 'code' : ''}
-                  </span>
-                </summary>
-                <div className="acc__body">
-                  <div dangerouslySetInnerHTML={{ __html: node.html }} />
-                  {tech && tech.length > 0 && (
-                    <TechLine>
-                      {tech.map(t => (
-                        <span key={t}>{t}</span>
-                      ))}
-                    </TechLine>
-                  )}
-                  <InlineLinks>
-                    {external && <a {...ext(external)}>Live ↗</a>}
-                    {github && <a {...ext(github)}>Code ↗</a>}
-                  </InlineLinks>
-                </div>
-              </Acc>
-            );
-          })}
-          <ChapterLink to="/archive">View the full archive →</ChapterLink>
-        </>
-      ),
-    },
-    writing: {
-      chapter: 'Chapter IV',
-      title: 'Writing',
-      body: (
-        <>
-          {posts.length > 0 ? (
-            posts.map(({ node }, i) => {
-              const { title, slug, date, tags } = node.frontmatter;
-              const d = new Date(date).toLocaleDateString();
-              return (
-                <Acc as="div" key={i} style={{ paddingBottom: 0 }}>
-                  <div style={{ padding: '13px 0' }}>
-                    <Link to={slug} style={{ color: 'var(--text)', fontSize: 'var(--fz-md)' }}>
-                      {title}
-                    </Link>
-                    <p
-                      style={{
-                        margin: '4px 0 0',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: 'var(--fz-xs)',
-                        color: 'var(--text-muted)',
-                      }}
-                    >
-                      {d}
-                      {tags && tags.length ? ` · ${tags.map(t => `#${t}`).join(' ')}` : ''}
-                    </p>
-                  </div>
-                </Acc>
-              );
-            })
-          ) : (
-            <p>Notes and write-ups, coming soon.</p>
-          )}
-          <ChapterLink to="/pensieve">All writing →</ChapterLink>
-        </>
-      ),
-    },
-    contact: {
-      chapter: 'Chapter V',
-      title: 'Contact',
-      body: (
-        <>
-          <p>
-            Open to discussing opportunities, ideas, or just saying hi. The fastest way to reach me
-            is email.
-          </p>
-          <InlineLinks>
-            <a href={`mailto:${email}`}>{email}</a>
-            <a {...ext('https://calendly.com/vaasutiwari')}>Schedule a call ↗</a>
-          </InlineLinks>
-          <InlineLinks>
-            {['Linkedin', 'GitHub', 'Twitter', 'Instagram'].map(name => {
-              const s = social(name);
-              return s ? (
-                <a key={name} {...ext(s.url)}>
-                  {name === 'Linkedin' ? 'LinkedIn' : name} ↗
-                </a>
-              ) : null;
-            })}
-          </InlineLinks>
-          <p style={{ marginTop: 18 }}>
-            <Link to="/resume" style={{ fontStyle: 'italic' }}>
-              Read the résumé →
-            </Link>
-          </p>
-        </>
-      ),
-    },
-    assistant: {
-      chapter: 'Chapter VI',
-      title: 'AI Assistant',
-      body: (
-        <>
-          <p>
-            Rather ask than read? I trained a small assistant on my résumé, projects, and career so
-            you can interview me in natural language — ask about a role, a technology, or how
-            I&apos;d approach a problem.
-          </p>
-          <ChapterLink to="/chat">Open the assistant →</ChapterLink>
-        </>
-      ),
-    },
+  const handlePrimary = id => {
+    setActiveSub(null);
+    setOpenId(prev => (prev === id ? null : id));
   };
 
+  const handleSub = (groupId, sub) => {
+    if (sub.to) {
+      navigate(sub.to);
+      return;
+    }
+    if (sub.href) {
+      window.open(sub.href, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    setActiveSub({ groupId, sub });
+  };
+
+  /* ---- geometry ---- */
+  const { w, h } = size;
+  const focused = !!openId;
+  const cx = focused ? Math.max(w * 0.3, 240) : w * 0.5;
+  const cy = h * 0.5;
+  const rx = focused ? Math.min(w * 0.2, 230) : Math.min(w * 0.3, 320);
+  const ry = focused ? Math.min(h * 0.28, 210) : Math.min(h * 0.33, 260);
+
+  const primaryPos = g => ({
+    x: cx + rx * Math.cos(rad(g.angle)),
+    y: cy + ry * Math.sin(rad(g.angle)),
+  });
+
+  const openGroup = groups.find(g => g.id === openId);
+  const subPositions = useMemo(() => {
+    if (!openGroup) {
+      return [];
+    }
+    const a = rad(openGroup.angle);
+    const p = { x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) };
+    // Push subs slightly outward (radial) and spread them along the tangent.
+    // A small outward push keeps edge nodes (top/bottom) on-screen, while a
+    // fixed tangential gap prevents long labels from overlapping.
+    const ux = Math.cos(a);
+    const uy = Math.sin(a);
+    const tx = -Math.sin(a);
+    const ty = Math.cos(a);
+    const push = Math.min(w, h) * 0.08;
+    const gap = clamp(Math.min(w, h) * 0.1, 84, 120);
+    const n = openGroup.subs.length;
+    // Reserve the right edge for the content pane so sub-nodes never sit under it.
+    const paneW = clamp(w * 0.38, 340, 560);
+    const maxX = w - paneW - 36;
+    return openGroup.subs.map((sub, i) => {
+      const b = (i - (n - 1) / 2) * gap;
+      return {
+        sub,
+        x: clamp(p.x + push * ux + b * tx, 84, maxX),
+        y: clamp(p.y + push * uy + b * ty, 64, h - 64),
+      };
+    });
+  }, [openGroup, w, h, cx, cy, rx, ry]);
+
+  const paneOpen = !!activeSub;
+  const activeGroup = activeSub && groups.find(g => g.id === activeSub.groupId);
+
   return (
-    <Stage>
-      <Edges aria-hidden="true">
-        {NODES.map(n => (
-          <line
-            key={n.id}
-            x1={`${CENTER.x}%`}
-            y1={`${CENTER.y}%`}
-            x2={`${n.x}%`}
-            y2={`${n.y}%`}
-            className={active ? (active === n.id ? 'active' : 'dim') : ''}
+    <Wrap ref={wrapRef}>
+      {/* ---------- Desktop graph ---------- */}
+      <DesktopGraph>
+        <Edges aria-hidden="true">
+          {groups.map(g => {
+            const p = primaryPos(g);
+            return (
+              <line
+                key={g.id}
+                x1={cx}
+                y1={cy}
+                x2={p.x}
+                y2={p.y}
+                className={openId ? (openId === g.id ? 'lit' : 'dim') : ''}
+              />
+            );
+          })}
+          {openGroup &&
+            subPositions.map(({ sub, x, y }) => {
+              const p = primaryPos(openGroup);
+              return <line key={sub.id} className="sub" x1={p.x} y1={p.y} x2={x} y2={y} />;
+            })}
+          <circle cx={cx} cy={cy} r="3" />
+          {groups.map(g => {
+            const p = primaryPos(g);
+            return (
+              <circle
+                key={g.id}
+                cx={p.x}
+                cy={p.y}
+                r="2.5"
+                opacity={openId && openId !== g.id ? 0.3 : 1}
+              />
+            );
+          })}
+        </Edges>
+
+        <Hub style={{ left: cx, top: cy }} onClick={reset} aria-label="Shaurya Tiwari — reset view">
+          <h1 className="name">
+            Shaurya
+            <br />
+            Tiwari
+          </h1>
+          <div className="rule" />
+          <div className="role">AI Software Engineer</div>
+        </Hub>
+
+        {groups.map(g => {
+          const p = primaryPos(g);
+          const cls = openId === g.id ? 'open' : openId ? 'dim' : '';
+          return (
+            <Primary
+              key={g.id}
+              className={cls}
+              style={{ left: p.x, top: p.y }}
+              onClick={() => handlePrimary(g.id)}
+              aria-expanded={openId === g.id}
+            >
+              <span className="num">{g.num}</span>
+              <span className="label">{g.label}</span>
+            </Primary>
+          );
+        })}
+
+        {openGroup &&
+          subPositions.map(({ sub, x, y }, i) => {
+            const isActive = activeSub && activeSub.sub.id === sub.id;
+            return (
+              <Sub
+                key={sub.id}
+                className={isActive ? 'active' : ''}
+                style={{ left: x, top: y, animationDelay: `${i * 0.035}s` }}
+                onClick={() => handleSub(openGroup.id, sub)}
+              >
+                <span className="sub-label">{sub.label}</span>
+              </Sub>
+            );
+          })}
+
+        <Portrait className={focused ? 'hidden' : ''}>
+          <figure style={{ margin: 0 }}>
+            <div className="frame">
+              <StaticImage
+                src="../../images/hero.png"
+                alt="Shaurya Tiwari"
+                width={264}
+                placeholder="blurred"
+                formats={['auto', 'webp', 'avif']}
+              />
+            </div>
+            <figcaption>Shaurya Tiwari</figcaption>
+          </figure>
+        </Portrait>
+      </DesktopGraph>
+
+      {/* ---------- Mobile fallback ---------- */}
+      <MobileNav>
+        <div className="m-hub">
+          <h1>
+            Shaurya
+            <br />
+            Tiwari
+          </h1>
+        </div>
+        <div className="m-role">AI Software Engineer</div>
+        <div className="m-portrait">
+          <StaticImage
+            src="../../images/hero.png"
+            alt="Shaurya Tiwari"
+            width={280}
+            placeholder="blurred"
+            formats={['auto', 'webp', 'avif']}
           />
+        </div>
+        {groups.map(g => (
+          <details key={g.id}>
+            <summary>
+              <span className="num">{g.num}</span>
+              {g.label}
+            </summary>
+            <div className="m-subs">
+              {g.subs.map(sub =>
+                sub.to ? (
+                  <Link key={sub.id} className="m-sub" to={sub.to}>
+                    {sub.label}
+                  </Link>
+                ) : sub.href ? (
+                  <a key={sub.id} className="m-sub" {...ext(sub.href)}>
+                    {sub.label} ↗
+                  </a>
+                ) : (
+                  <button
+                    key={sub.id}
+                    className="m-sub"
+                    type="button"
+                    onClick={() => setActiveSub({ groupId: g.id, sub })}
+                  >
+                    {sub.label}
+                  </button>
+                ),
+              )}
+            </div>
+          </details>
         ))}
-        <circle cx={`${CENTER.x}%`} cy={`${CENTER.y}%`} r="3" />
-        {NODES.map(n => (
-          <circle key={n.id} cx={`${n.x}%`} cy={`${n.y}%`} r="2.5" />
-        ))}
-      </Edges>
+      </MobileNav>
 
-      <Center>
-        <h1 className="name big-heading">
-          Shaurya
-          <br />
-          Tiwari
-        </h1>
-        <div className="rule" />
-        <div className="role">AI Software Engineer</div>
-        <p className="hint">a portfolio in six chapters — open one</p>
-      </Center>
-
-      {NODES.map(n => (
-        <NodeButton
-          key={n.id}
-          style={{ left: `${n.x}%`, top: `${n.y}%` }}
-          onClick={() => setActive(n.id)}
-          aria-expanded={active === n.id}
-          aria-haspopup="dialog"
-        >
-          <span className="num">{n.num}</span>
-          <span className="label">{n.label}</span>
-        </NodeButton>
-      ))}
-
-      <Caption>© {new Date().getFullYear()} Shaurya Tiwari</Caption>
-
-      {active && (
-        <>
-          <Backdrop onClick={close} />
-          <Sheet role="dialog" aria-modal="true" aria-label={PANELS[active].title}>
-            <div className="sheet__head">
+      {/* ---------- Right pane ---------- */}
+      <Pane className={paneOpen ? 'open' : ''} aria-hidden={!paneOpen}>
+        {activeSub && (
+          <>
+            <div className="pane__head">
               <div>
-                <div className="sheet__chapter">{PANELS[active].chapter}</div>
-                <h2 className="sheet__title">{PANELS[active].title}</h2>
+                <div className="pane__chapter">{activeGroup ? activeGroup.label : ''}</div>
+                <h2 className="pane__title">{activeSub.sub.title}</h2>
               </div>
-              <button className="sheet__close" onClick={close} aria-label="Close">
+              <button className="pane__close" onClick={closeSub} aria-label="Close" type="button">
                 ×
               </button>
             </div>
-            <div className="sheet__body">{PANELS[active].body}</div>
-          </Sheet>
-        </>
-      )}
-    </Stage>
+            <div className="pane__body">{activeSub.sub.body}</div>
+          </>
+        )}
+      </Pane>
+    </Wrap>
   );
 };
 
