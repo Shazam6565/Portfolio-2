@@ -1,13 +1,49 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'gatsby';
 import styled, { ThemeProvider } from 'styled-components';
-import { Head, Nav, Footer } from '@components';
+import { Head, Footer, ThemeToggle } from '@components';
 import { GlobalStyle, theme } from '@styles';
 
 const StyledContent = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+`;
+
+const StyledChrome = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
+
+  .home-link {
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    letter-spacing: 0.04em;
+    color: var(--text);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  .spacer {
+    width: 1px;
+  }
 `;
 
 const Layout = ({ children, location }) => {
@@ -28,7 +64,7 @@ const Layout = ({ children, location }) => {
 
   useEffect(() => {
     if (location.hash) {
-      const id = location.hash.substring(1); // location.hash without the '#'
+      const id = location.hash.substring(1);
       setTimeout(() => {
         const el = document.getElementById(id);
         if (el) {
@@ -53,14 +89,27 @@ const Layout = ({ children, location }) => {
             Skip to Content
           </a>
 
-          <StyledContent>
-            <Nav isHome={isHome} />
+          <StyledChrome>
+            {isHome ? (
+              <span className="spacer" />
+            ) : (
+              <Link className="home-link" to="/">
+                ← shaurya tiwari
+              </Link>
+            )}
+            <ThemeToggle />
+          </StyledChrome>
 
-            <div id="content">
-              {children}
-              <Footer />
-            </div>
-          </StyledContent>
+          {isHome ? (
+            <main id="content">{children}</main>
+          ) : (
+            <StyledContent>
+              <div id="content">
+                {children}
+                <Footer />
+              </div>
+            </StyledContent>
+          )}
         </ThemeProvider>
       </div>
     </>

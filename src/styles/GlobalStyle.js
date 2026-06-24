@@ -73,9 +73,10 @@ const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     background-color: var(--bg);
     color: var(--text-secondary);
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
     font-size: var(--fz-md);
-    line-height: 1.6;
+    line-height: 1.65;
+    transition: background-color 0.3s ease, color 0.3s ease;
 
     &.hidden {
       overflow: hidden;
@@ -143,19 +144,21 @@ const GlobalStyle = createGlobalStyle`
     margin: 0 0 10px 0;
     font-weight: 600;
     color: var(--text);
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    line-height: 1.15;
+    letter-spacing: 0;
   }
 
   .big-heading {
     margin: 0;
-    font-size: clamp(28px, 5vw, 44px);
-    letter-spacing: -0.02em;
+    font-weight: 500;
+    font-size: clamp(40px, 7vw, 66px);
+    letter-spacing: 0;
   }
 
   .medium-heading {
     margin: 0;
-    font-size: clamp(22px, 4vw, 30px);
+    font-weight: 500;
+    font-size: clamp(24px, 4vw, 34px);
   }
 
   .numbered-heading {
