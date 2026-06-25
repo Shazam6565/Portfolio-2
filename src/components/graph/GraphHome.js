@@ -148,7 +148,7 @@ const Sub = styled.button`
   z-index: 3;
   padding: 6px 9px;
   max-width: 150px;
-  animation: subIn 0.32s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation: rayOut 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 
   .sub-label {
     font-size: var(--fz-sm);
@@ -174,10 +174,11 @@ const Sub = styled.button`
     font-weight: 600;
   }
 
-  @keyframes subIn {
+  /* Each ray flies out from the sun (centre) to its endpoint. */
+  @keyframes rayOut {
     from {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.6);
+      transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(0.7);
     }
     to {
       opacity: 1;
@@ -776,88 +777,85 @@ const GraphHome = () => {
   /* ---- geometry ---- */
   const { w, h } = size;
   const focused = !!openId;
-  const cx = focused ? Math.max(w * 0.3, 240) : w * 0.5;
-  const cy = h * 0.5;
-  const rx = focused ? Math.min(w * 0.2, 230) : Math.min(w * 0.3, 320);
-  const ry = focused ? Math.min(h * 0.28, 210) : Math.min(h * 0.33, 260);
+  const paneOpen = !!activeSub;
+  const paneW = clamp(w * 0.38, 340, 560);
 
-  const primaryPos = g => ({
-    x: cx + rx * Math.cos(rad(g.angle)),
-    y: cy + ry * Math.sin(rad(g.angle)),
+  // Idle: hub at centre, primaries evenly spaced on a ring around it.
+  const hubX = w / 2;
+  const hubY = h / 2;
+  const ringRx = Math.min(w * 0.3, 340);
+  const ringRy = Math.min(h * 0.33, 270);
+  const ringPos = g => ({
+    x: hubX + ringRx * Math.cos(rad(g.angle)),
+    y: hubY + ringRy * Math.sin(rad(g.angle)),
   });
 
+  // Focus: the opened node becomes the "sun" at the centre of the open area
+  // and its sub-nodes radiate out as evenly spaced rays of equal length.
+  const sunX = paneOpen ? (w - paneW) / 2 : w / 2;
+  const sunY = h / 2;
+  const rayR = Math.max(150, Math.min((w - paneW) / 2 - 100, h / 2 - 96));
+
   const openGroup = groups.find(g => g.id === openId);
-  const subPositions = useMemo(() => {
+  const rayPositions = useMemo(() => {
     if (!openGroup) {
       return [];
     }
-    const a = rad(openGroup.angle);
-    const p = { x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) };
-    // Push subs slightly outward (radial) and spread them along the tangent.
-    // A small outward push keeps edge nodes (top/bottom) on-screen, while a
-    // fixed tangential gap prevents long labels from overlapping.
-    const ux = Math.cos(a);
-    const uy = Math.sin(a);
-    const tx = -Math.sin(a);
-    const ty = Math.cos(a);
-    const push = Math.min(w, h) * 0.08;
-    const gap = clamp(Math.min(w, h) * 0.1, 84, 120);
     const n = openGroup.subs.length;
-    // Reserve the right edge for the content pane so sub-nodes never sit under it.
-    const paneW = clamp(w * 0.38, 340, 560);
-    const maxX = w - paneW - 36;
     return openGroup.subs.map((sub, i) => {
-      const b = (i - (n - 1) / 2) * gap;
-      return {
-        sub,
-        x: clamp(p.x + push * ux + b * tx, 84, maxX),
-        y: clamp(p.y + push * uy + b * ty, 64, h - 64),
-      };
+      const ang = -90 + (360 / n) * i;
+      return { sub, x: sunX + rayR * Math.cos(rad(ang)), y: sunY + rayR * Math.sin(rad(ang)) };
     });
-  }, [openGroup, w, h, cx, cy, rx, ry]);
+  }, [openGroup, sunX, sunY, rayR]);
 
-  const paneOpen = !!activeSub;
   const activeGroup = activeSub && groups.find(g => g.id === activeSub.groupId);
+
+  const primaryState = g => {
+    if (!focused) {
+      return { ...ringPos(g), opacity: 1, on: true };
+    }
+    if (g.id === openId) {
+      return { x: sunX, y: sunY, opacity: 1, on: true };
+    }
+    return { ...ringPos(g), opacity: 0, on: false };
+  };
 
   return (
     <Wrap ref={wrapRef}>
       {/* ---------- Desktop graph ---------- */}
       <DesktopGraph>
         <Edges aria-hidden="true">
-          {groups.map(g => {
-            const p = primaryPos(g);
-            return (
-              <line
-                key={g.id}
-                x1={cx}
-                y1={cy}
-                x2={p.x}
-                y2={p.y}
-                className={openId ? (openId === g.id ? 'lit' : 'dim') : ''}
-              />
-            );
-          })}
-          {openGroup &&
-            subPositions.map(({ sub, x, y }) => {
-              const p = primaryPos(openGroup);
-              return <line key={sub.id} className="sub" x1={p.x} y1={p.y} x2={x} y2={y} />;
+          {!focused &&
+            groups.map(g => {
+              const p = ringPos(g);
+              return <line key={g.id} x1={hubX} y1={hubY} x2={p.x} y2={p.y} />;
             })}
-          <circle cx={cx} cy={cy} r="3" />
-          {groups.map(g => {
-            const p = primaryPos(g);
-            return (
-              <circle
-                key={g.id}
-                cx={p.x}
-                cy={p.y}
-                r="2.5"
-                opacity={openId && openId !== g.id ? 0.3 : 1}
-              />
-            );
-          })}
+          {focused &&
+            rayPositions.map(({ sub, x, y }) => (
+              <line key={sub.id} className="sub" x1={sunX} y1={sunY} x2={x} y2={y} />
+            ))}
+          <circle cx={focused ? sunX : hubX} cy={focused ? sunY : hubY} r="3" />
+          {!focused &&
+            groups.map(g => {
+              const p = ringPos(g);
+              return <circle key={g.id} cx={p.x} cy={p.y} r="2.5" />;
+            })}
+          {focused &&
+            rayPositions.map(({ sub, x, y }) => (
+              <circle key={`dot-${sub.id}`} className="sub" cx={x} cy={y} r="2.5" />
+            ))}
         </Edges>
 
-        <Hub style={{ left: cx, top: cy }} onClick={reset} aria-label="Shaurya Tiwari — reset view">
+        <Hub
+          style={{
+            left: hubX,
+            top: hubY,
+            opacity: focused ? 0 : 1,
+            pointerEvents: focused ? 'none' : 'auto',
+          }}
+          onClick={reset}
+          aria-label="Shaurya Tiwari — home"
+        >
           <h1 className="name">
             Shaurya
             <br />
@@ -868,13 +866,18 @@ const GraphHome = () => {
         </Hub>
 
         {groups.map(g => {
-          const p = primaryPos(g);
-          const cls = openId === g.id ? 'open' : openId ? 'dim' : '';
+          const st = primaryState(g);
+          const cls = openId === g.id ? 'open' : '';
           return (
             <Primary
               key={g.id}
               className={cls}
-              style={{ left: p.x, top: p.y }}
+              style={{
+                left: st.x,
+                top: st.y,
+                opacity: st.opacity,
+                pointerEvents: st.on ? 'auto' : 'none',
+              }}
               onClick={() => handlePrimary(g.id)}
               aria-expanded={openId === g.id}
             >
@@ -884,14 +887,20 @@ const GraphHome = () => {
           );
         })}
 
-        {openGroup &&
-          subPositions.map(({ sub, x, y }, i) => {
+        {focused &&
+          rayPositions.map(({ sub, x, y }, i) => {
             const isActive = activeSub && activeSub.sub.id === sub.id;
             return (
               <Sub
                 key={sub.id}
                 className={isActive ? 'active' : ''}
-                style={{ left: x, top: y, animationDelay: `${i * 0.035}s` }}
+                style={{
+                  left: x,
+                  top: y,
+                  '--dx': `${sunX - x}px`,
+                  '--dy': `${sunY - y}px`,
+                  animationDelay: `${i * 0.03}s`,
+                }}
                 onClick={() => handleSub(openGroup.id, sub)}
               >
                 <span className="sub-label">{sub.label}</span>
