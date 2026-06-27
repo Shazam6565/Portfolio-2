@@ -156,8 +156,8 @@ const Primary = styled.button`
 const Sub = styled.button`
   ${nodeBase};
   z-index: 3;
-  padding: 7px 12px;
-  max-width: 172px;
+  padding: 6px 10px;
+  max-width: 138px;
   animation: rayOut 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 
   .sub-label {
@@ -632,7 +632,7 @@ const GraphHome = () => {
         ],
       },
       { id: 'experience', label: 'Experience', num: 'II', angle: -30, subs: jobSubs },
-      { id: 'projects', label: 'Work / Projects', num: 'III', angle: 30, subs: projSubs },
+      { id: 'projects', label: 'Recent Work', num: 'III', angle: 30, subs: projSubs },
       { id: 'archive', label: 'Project Archive', num: 'IV', angle: 64, to: '/archive' },
       { id: 'writing', label: 'Writing', num: 'V', angle: 90, subs: postSubs },
       {
@@ -789,7 +789,11 @@ const GraphHome = () => {
   // and its sub-nodes radiate out as evenly spaced rays of equal length.
   const sunX = paneOpen ? (w - paneW) / 2 : w / 2;
   const sunY = centerY;
-  const rayR = Math.max(150, Math.min((w - paneW) / 2 - 100, h / 2 - 96));
+  // Horizontal room a ray can use: the full half-width when the pane is
+  // closed, or only the space left of the pane when it is open. (Reserving
+  // the pane width while it's closed pulled the side rays in too tight.)
+  const horizHalf = paneOpen ? (w - paneW) / 2 : w / 2;
+  const rayR = Math.max(170, Math.min(horizHalf - 120, h / 2 - 90));
 
   const openGroup = groups.find(g => g.id === openId);
   const rayPositions = useMemo(() => {
