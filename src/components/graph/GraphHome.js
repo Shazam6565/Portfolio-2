@@ -187,36 +187,6 @@ const Sub = styled.button`
   }
 `;
 
-const Portrait = styled.div`
-  position: absolute;
-  left: 36px;
-  bottom: 34px;
-  width: 132px;
-  z-index: 2;
-  transition: opacity 0.3s ease;
-
-  &.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .frame {
-    border: 1px solid var(--line);
-    line-height: 0;
-  }
-  img {
-    /* photo is already black & white — leave it untouched */
-  }
-  figcaption {
-    margin-top: 8px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-`;
-
 const Pane = styled.aside`
   position: fixed;
   top: 0;
@@ -373,12 +343,6 @@ const MobileNav = styled.div`
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--text-muted);
-  }
-  .m-portrait {
-    width: 140px;
-    border: 1px solid var(--line);
-    line-height: 0;
-    margin: 0 0 28px;
   }
   details {
     border-top: 1px solid var(--line);
@@ -907,21 +871,6 @@ const GraphHome = () => {
               </Sub>
             );
           })}
-
-        <Portrait className={focused ? 'hidden' : ''}>
-          <figure style={{ margin: 0 }}>
-            <div className="frame">
-              <StaticImage
-                src="../../images/hero.png"
-                alt="Shaurya Tiwari"
-                width={264}
-                placeholder="blurred"
-                formats={['auto', 'webp', 'avif']}
-              />
-            </div>
-            <figcaption>Shaurya Tiwari</figcaption>
-          </figure>
-        </Portrait>
       </DesktopGraph>
 
       {/* ---------- Mobile fallback ---------- */}
@@ -934,15 +883,6 @@ const GraphHome = () => {
           </h1>
         </div>
         <div className="m-role">AI Software Engineer</div>
-        <div className="m-portrait">
-          <StaticImage
-            src="../../images/hero.png"
-            alt="Shaurya Tiwari"
-            width={280}
-            placeholder="blurred"
-            formats={['auto', 'webp', 'avif']}
-          />
-        </div>
         {groups.map(g => (
           <details key={g.id}>
             <summary>
