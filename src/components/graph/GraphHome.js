@@ -11,7 +11,6 @@ const ext = url => ({ href: url, target: '_blank', rel: 'noopener noreferrer' })
 const rad = deg => (deg * Math.PI) / 180;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const shortCompany = c => c.split(' & ')[0].split(' at ')[0].split(',')[0].trim();
-const shortText = (t, n) => (t.length > n ? `${t.slice(0, n).trim()}…` : t);
 
 /* Concise but fully-readable labels for the featured projects — the raw
    titles were getting truncated into "…" around the graph. */
@@ -455,30 +454,11 @@ const GraphHome = () => {
           }
         }
       }
-      posts: allMarkdownRemark(
-        filter: {
-          fileAbsolutePath: { regex: "/content/posts/" }
-          frontmatter: { draft: { ne: true } }
-        }
-        sort: { fields: [frontmatter___date], order: DESC }
-      ) {
-        edges {
-          node {
-            frontmatter {
-              title
-              slug
-              date
-              tags
-            }
-          }
-        }
-      }
     }
   `);
 
   const jobs = data.jobs.edges.map(e => e.node);
   const featured = data.featured.edges.map(e => e.node);
-  const posts = data.posts.edges.map(e => e.node);
   const social = name => socialMedia.find(s => s.name.toLowerCase() === name.toLowerCase());
 
   /* ---- content builders ---- */
@@ -535,34 +515,6 @@ const GraphHome = () => {
         </>
       ),
     }));
-    const postSubs = posts.map((n, i) => ({
-      id: `post-${i}`,
-      label: shortText(n.frontmatter.title, 20),
-      title: n.frontmatter.title,
-      body: (
-        <>
-          <Meta>
-            {new Date(n.frontmatter.date).toLocaleDateString()}
-            {n.frontmatter.tags && n.frontmatter.tags.length
-              ? ` · ${n.frontmatter.tags.map(t => `#${t}`).join(' ')}`
-              : ''}
-          </Meta>
-          <p>
-            <Link to={n.frontmatter.slug}>Read the full piece →</Link>
-          </p>
-        </>
-      ),
-    }));
-    if (postSubs.length === 0) {
-      postSubs.push({
-        id: 'soon',
-        label: 'Notes',
-        title: 'Writing',
-        body: <p>Notes and write-ups, coming soon.</p>,
-      });
-    }
-    postSubs.push({ id: 'all-writing', label: 'All writing →', to: '/pensieve' });
-
     const base = [
       {
         id: 'about',
@@ -634,7 +586,13 @@ const GraphHome = () => {
       { id: 'experience', label: 'Experience', num: 'II', angle: -30, subs: jobSubs },
       { id: 'projects', label: 'Recent Work', num: 'III', angle: 30, subs: projSubs },
       { id: 'archive', label: 'Project Archive', num: 'IV', angle: 64, to: '/archive' },
-      { id: 'writing', label: 'Writing', num: 'V', angle: 90, subs: postSubs },
+      {
+        id: 'physical-ai',
+        label: 'Physical AI',
+        num: 'V',
+        angle: 90,
+        subs: [{ id: 'instrux', label: 'instrux.world', href: 'https://instrux.world/' }],
+      },
       {
         id: 'contact',
         label: 'Contact',
