@@ -13,6 +13,16 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const shortCompany = c => c.split(' & ')[0].split(' at ')[0].split(',')[0].trim();
 const shortText = (t, n) => (t.length > n ? `${t.slice(0, n).trim()}…` : t);
 
+/* Concise but fully-readable labels for the featured projects — the raw
+   titles were getting truncated into "…" around the graph. */
+const PROJECT_LABELS = {
+  'Academic Insights AI Assistant': 'Academic Insights AI',
+  'LLM Powered personalized Chatbot': 'Personalized LLM Chatbot',
+  'Transformer -Text Completion Model': 'Transformer Text Model',
+  'Educational YouTube Channel': 'Educational YouTube',
+};
+const projectLabel = t => PROJECT_LABELS[t] || t;
+
 /* ------------------------------------------------------------------ */
 /* Styled                                                              */
 /* ------------------------------------------------------------------ */
@@ -146,8 +156,8 @@ const Primary = styled.button`
 const Sub = styled.button`
   ${nodeBase};
   z-index: 3;
-  padding: 6px 9px;
-  max-width: 150px;
+  padding: 7px 12px;
+  max-width: 172px;
   animation: rayOut 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 
   .sub-label {
@@ -350,6 +360,17 @@ const MobileNav = styled.div`
       border-bottom: 1px solid var(--line);
     }
   }
+  .m-link {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+    padding: 16px 2px;
+    font-size: var(--fz-xl);
+    font-style: italic;
+    color: var(--text);
+    text-decoration: none;
+  }
   summary {
     list-style: none;
     cursor: pointer;
@@ -495,7 +516,7 @@ const GraphHome = () => {
 
     const projSubs = featured.map((n, i) => ({
       id: `proj-${i}`,
-      label: shortText(n.frontmatter.title, 16),
+      label: projectLabel(n.frontmatter.title),
       title: n.frontmatter.title,
       body: (
         <>
@@ -514,8 +535,6 @@ const GraphHome = () => {
         </>
       ),
     }));
-    projSubs.push({ id: 'archive', label: 'Archive →', to: '/archive' });
-
     const postSubs = posts.map((n, i) => ({
       id: `post-${i}`,
       label: shortText(n.frontmatter.title, 20),
@@ -544,7 +563,7 @@ const GraphHome = () => {
     }
     postSubs.push({ id: 'all-writing', label: 'All writing →', to: '/pensieve' });
 
-    return [
+    const base = [
       {
         id: 'about',
         label: 'About',
@@ -614,11 +633,12 @@ const GraphHome = () => {
       },
       { id: 'experience', label: 'Experience', num: 'II', angle: -30, subs: jobSubs },
       { id: 'projects', label: 'Work / Projects', num: 'III', angle: 30, subs: projSubs },
-      { id: 'writing', label: 'Writing', num: 'IV', angle: 90, subs: postSubs },
+      { id: 'archive', label: 'Project Archive', num: 'IV', angle: 64, to: '/archive' },
+      { id: 'writing', label: 'Writing', num: 'V', angle: 90, subs: postSubs },
       {
         id: 'contact',
         label: 'Contact',
-        num: 'V',
+        num: 'VI',
         angle: 150,
         subs: [
           {
@@ -655,7 +675,7 @@ const GraphHome = () => {
       {
         id: 'assistant',
         label: 'AI Assistant',
-        num: 'VI',
+        num: 'VII',
         angle: 210,
         subs: [
           { id: 'open-chat', label: 'Open chat →', to: '/chat' },
@@ -679,6 +699,8 @@ const GraphHome = () => {
         ],
       },
     ];
+    // Evenly distribute every node around the hub (sun-ray spacing).
+    return base.map((g, i) => ({ ...g, angle: -90 + (360 / base.length) * i }));
   }, [data]);
 
   /* ---- state ---- */
@@ -722,6 +744,11 @@ const GraphHome = () => {
   }, [activeSub, openId, closeSub]);
 
   const handlePrimary = id => {
+    const g = groups.find(x => x.id === id);
+    if (g && g.to) {
+      navigate(g.to);
+      return;
+    }
     setActiveSub(null);
     setOpenId(prev => (prev === id ? null : id));
   };
@@ -766,7 +793,7 @@ const GraphHome = () => {
 
   const openGroup = groups.find(g => g.id === openId);
   const rayPositions = useMemo(() => {
-    if (!openGroup) {
+    if (!openGroup || !openGroup.subs) {
       return [];
     }
     const n = openGroup.subs.length;
@@ -887,36 +914,43 @@ const GraphHome = () => {
           </h1>
         </div>
         <div className="m-role">AI Software Engineer</div>
-        {groups.map(g => (
-          <details key={g.id}>
-            <summary>
+        {groups.map(g =>
+          g.to ? (
+            <Link key={g.id} className="m-link" to={g.to}>
               <span className="num">{g.num}</span>
-              {g.label}
-            </summary>
-            <div className="m-subs">
-              {g.subs.map(sub =>
-                sub.to ? (
-                  <Link key={sub.id} className="m-sub" to={sub.to}>
-                    {sub.label}
-                  </Link>
-                ) : sub.href ? (
-                  <a key={sub.id} className="m-sub" {...ext(sub.href)}>
-                    {sub.label} ↗
-                  </a>
-                ) : (
-                  <button
-                    key={sub.id}
-                    className="m-sub"
-                    type="button"
-                    onClick={() => setActiveSub({ groupId: g.id, sub })}
-                  >
-                    {sub.label}
-                  </button>
-                ),
-              )}
-            </div>
-          </details>
-        ))}
+              {g.label} →
+            </Link>
+          ) : (
+            <details key={g.id}>
+              <summary>
+                <span className="num">{g.num}</span>
+                {g.label}
+              </summary>
+              <div className="m-subs">
+                {g.subs.map(sub =>
+                  sub.to ? (
+                    <Link key={sub.id} className="m-sub" to={sub.to}>
+                      {sub.label}
+                    </Link>
+                  ) : sub.href ? (
+                    <a key={sub.id} className="m-sub" {...ext(sub.href)}>
+                      {sub.label} ↗
+                    </a>
+                  ) : (
+                    <button
+                      key={sub.id}
+                      className="m-sub"
+                      type="button"
+                      onClick={() => setActiveSub({ groupId: g.id, sub })}
+                    >
+                      {sub.label}
+                    </button>
+                  ),
+                )}
+              </div>
+            </details>
+          ),
+        )}
       </MobileNav>
 
       {/* ---------- Right pane ---------- */}
