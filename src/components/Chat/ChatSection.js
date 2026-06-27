@@ -257,18 +257,22 @@ const ChatSection = () => {
     }
 
     const userMsg = { role: 'user', content: input };
+
+    // Recent turns for context (mapped to the API's role names).
+    const history = messages
+      .filter(m => m.role === 'user' || m.role === 'bot')
+      .slice(-8)
+      .map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content }));
+
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
 
     try {
-      const API_URL =
-        process.env.NODE_ENV === 'development'
-          ? 'http://localhost:8001/chat'
-          : 'https://shaurya-chat-endpoint.onrender.com/chat';
-
-      const response = await axios.post(API_URL, {
+      // Netlify serverless function (free) — see netlify/functions/chat.js.
+      const response = await axios.post('/.netlify/functions/chat', {
         message: userMsg.content,
+        history,
       });
 
       const botMsg = { role: 'bot', content: response.data.response };
