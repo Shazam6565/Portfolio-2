@@ -744,9 +744,13 @@ const GraphHome = () => {
   const paneOpen = !!activeSub;
   const paneW = clamp(w * 0.38, 340, 560);
 
+  // Nudge the whole composition slightly above the exact middle so it reads
+  // as optically centred rather than sitting a touch low.
+  const centerY = h / 2 - Math.min(h * 0.05, 44);
+
   // Idle: hub at centre, primaries evenly spaced on a ring around it.
   const hubX = w / 2;
-  const hubY = h / 2;
+  const hubY = centerY;
   const ringRx = Math.min(w * 0.3, 340);
   const ringRy = Math.min(h * 0.33, 270);
   const ringPos = g => ({
@@ -757,7 +761,7 @@ const GraphHome = () => {
   // Focus: the opened node becomes the "sun" at the centre of the open area
   // and its sub-nodes radiate out as evenly spaced rays of equal length.
   const sunX = paneOpen ? (w - paneW) / 2 : w / 2;
-  const sunY = h / 2;
+  const sunY = centerY;
   const rayR = Math.max(150, Math.min((w - paneW) / 2 - 100, h / 2 - 96));
 
   const openGroup = groups.find(g => g.id === openId);
