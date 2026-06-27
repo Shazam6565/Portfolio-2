@@ -10,5 +10,10 @@ package-lock.json
 /backend/.env
 .vscode/
 
+# Local env files (never commit secrets like GROQ_API_KEY)
+.env
+.env.*
+!.env.example
+
 # Local MCP puppeteer session logs
 logs/mcp-puppeteer-*.log
