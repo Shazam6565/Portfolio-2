@@ -71,12 +71,7 @@ const Footer = () => (
         ))}
     </div>
 
-    <div className="credit">
-      © Shaurya Tiwari · Design adapted from{' '}
-      <a href="https://github.com/bchiang7/v4" target="_blank" rel="noreferrer">
-        Brittany Chiang
-      </a>
-    </div>
+    <div className="credit">© Shaurya Tiwari</div>
   </StyledFooter>
 );
 

@@ -127,7 +127,10 @@ const Layout = ({ children, location }) => {
           </StyledChrome>
 
           {isHome ? (
-            <main id="content">{children}</main>
+            <main id="content">
+              {children}
+              <Footer />
+            </main>
           ) : (
             <StyledContent>
               <div id="content">
