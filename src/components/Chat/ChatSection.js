@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 
 const fadeIn = keyframes`
@@ -269,14 +268,51 @@ const ChatSection = () => {
     setLoading(true);
 
     try {
-      // Netlify serverless function (free) — see netlify/functions/chat.js.
-      const response = await axios.post('/.netlify/functions/chat', {
-        message: userMsg.content,
-        history,
+      // Netlify serverless function (free) — see netlify/functions/chat.mjs.
+      // It streams the reply back as plain text, token by token.
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg.content, history }),
       });
 
-      const botMsg = { role: 'bot', content: response.data.response };
-      setMessages(prev => [...prev, botMsg]);
+      if (!response.body) {
+        throw new Error('No response stream');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = '';
+      let started = false;
+
+      for (;;) {
+        // eslint-disable-next-line no-await-in-loop
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        acc += decoder.decode(value, { stream: true });
+
+        if (!started) {
+          // First chunk arrived: drop the typing indicator and add the bubble.
+          started = true;
+          setLoading(false);
+          setMessages(prev => [...prev, { role: 'bot', content: acc }]);
+        } else {
+          setMessages(prev => {
+            const next = [...prev];
+            next[next.length - 1] = { role: 'bot', content: acc };
+            return next;
+          });
+        }
+      }
+
+      if (!started) {
+        setMessages(prev => [
+          ...prev,
+          { role: 'bot', content: 'Sorry, I didn\'t catch that — please try again.' },
+        ]);
+      }
     } catch (error) {
       console.error('Chat Error:', error);
       setMessages(prev => [

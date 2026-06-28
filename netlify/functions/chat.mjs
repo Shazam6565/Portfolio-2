@@ -1,10 +1,11 @@
 /**
- * Serverless chat backend for the portfolio AI assistant.
+ * Streaming serverless chat backend for the portfolio AI assistant.
  *
- * Runs on Netlify Functions (free tier) and proxies the visitor's message to
- * Groq's free LLM API. The Groq API key is read from the GROQ_API_KEY
- * environment variable configured in the Netlify dashboard — it never lives in
- * the repo. No always-on server, so nothing to keep paid/awake.
+ * Netlify Function (v2 / ESM) running on the free tier. It proxies the
+ * visitor's message to Groq's free LLM API with streaming enabled and pipes the
+ * token deltas straight back to the browser as a plain-text stream. The Groq key
+ * is read from the GROQ_API_KEY env var (set in the Netlify dashboard) and never
+ * lives in the repo. No always-on server to keep paid/awake.
  */
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -54,46 +55,44 @@ Rules:
 BACKGROUND:
 ${BACKGROUND}`;
 
-const json = (statusCode, body) => ({
-  statusCode,
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(body),
-});
+const text = (body, status = 200) =>
+  new Response(body, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 
-exports.handler = async event => {
-  if (event.httpMethod !== 'POST') {
-    return json(405, { response: 'Method not allowed.' });
+export default async req => {
+  if (req.method !== 'POST') {
+    return text('Method not allowed.', 405);
   }
 
   if (!process.env.GROQ_API_KEY) {
-    return json(500, {
-      response:
-        'The assistant isn\'t configured yet. Please reach out to Shaurya directly at vaasutiwari@gmail.com.',
-    });
+    return text(
+      "The assistant isn't configured yet. Please reach out to Shaurya directly at vaasutiwari@gmail.com.",
+      500
+    );
   }
 
   let payload;
   try {
-    payload = JSON.parse(event.body || '{}');
+    payload = await req.json();
   } catch (e) {
-    return json(400, { response: 'Invalid request.' });
+    return text('Invalid request.', 400);
   }
 
   const message = (payload.message || '').toString().trim().slice(0, 2000);
   if (!message) {
-    return json(400, { response: 'Please type a question.' });
+    return text('Please type a question.', 400);
   }
 
   // Optional prior turns from the client, capped to keep the request small.
   const history = Array.isArray(payload.history)
     ? payload.history
-      .filter(m => m && (m.role === 'user' || m.role === 'assistant') && m.content)
-      .slice(-8)
-      .map(m => ({ role: m.role, content: m.content.toString().slice(0, 2000) }))
+        .filter(m => m && (m.role === 'user' || m.role === 'assistant') && m.content)
+        .slice(-8)
+        .map(m => ({ role: m.role, content: m.content.toString().slice(0, 2000) }))
     : [];
 
+  let groqRes;
   try {
-    const res = await fetch(GROQ_URL, {
+    groqRes = await fetch(GROQ_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -103,6 +102,7 @@ exports.handler = async event => {
         model: GROQ_MODEL,
         temperature: 0.4,
         max_tokens: 600,
+        stream: true,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           ...history,
@@ -110,26 +110,61 @@ exports.handler = async event => {
         ],
       }),
     });
-
-    if (!res.ok) {
-      const detail = await res.text();
-      console.error('Groq error', res.status, detail);
-      return json(502, {
-        response:
-          'Sorry, I\'m having trouble reaching the assistant right now. Try again in a moment.',
-      });
-    }
-
-    const data = await res.json();
-    const reply = data?.choices?.[0]?.message?.content?.trim();
-    return json(200, {
-      response: reply || 'Hmm, I couldn\'t come up with an answer to that one.',
-    });
   } catch (err) {
     console.error('Chat function error', err);
-    return json(502, {
-      response:
-        'Sorry, I\'m having trouble reaching the assistant right now. Try again in a moment.',
-    });
+    return text("Sorry, I'm having trouble reaching the assistant right now. Try again in a moment.", 502);
   }
+
+  if (!groqRes.ok || !groqRes.body) {
+    const detail = groqRes.body ? await groqRes.text() : '(no body)';
+    console.error('Groq error', groqRes.status, detail);
+    return text("Sorry, I'm having trouble reaching the assistant right now. Try again in a moment.", 502);
+  }
+
+  // Parse Groq's SSE stream and re-emit just the text deltas to the browser.
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = groqRes.body.getReader();
+      const decoder = new TextDecoder();
+      const encoder = new TextEncoder();
+      let buffer = '';
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) continue;
+            const data = trimmed.slice(5).trim();
+            if (data === '[DONE]') {
+              controller.close();
+              return;
+            }
+            try {
+              const json = JSON.parse(data);
+              const delta = json.choices?.[0]?.delta?.content;
+              if (delta) controller.enqueue(encoder.encode(delta));
+            } catch (e) {
+              /* ignore keep-alive / partial lines */
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Stream error', err);
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-cache',
+    },
+  });
 };
