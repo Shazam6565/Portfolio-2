@@ -1,222 +1,201 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import ReactMarkdown from 'react-markdown';
 
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
+const blink = keyframes`
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 `;
 
-const StyledChatSection = styled.section`
+const Wrap = styled.section`
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
+`;
 
-  header {
-    width: 100%;
-    margin-bottom: 24px;
+const Header = styled.header`
+  margin-bottom: 22px;
 
-    .ai-label {
-      display: block;
-      margin-bottom: 8px;
-      font-family: var(--font-mono);
-      font-size: var(--fz-xs);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
+  .label {
+    display: block;
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
 
-    h1 {
-      margin: 0;
-      font-size: var(--fz-heading);
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      line-height: 1.1;
-      color: var(--text);
-    }
+  h1 {
+    margin: 0;
+    font-size: var(--fz-heading);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--text);
   }
 `;
 
-const ChatContainer = styled.div`
+const Terminal = styled.div`
   width: 100%;
-  height: 65vh;
-  min-height: 360px;
-  background-color: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 0;
+  height: 66vh;
+  min-height: 380px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-`;
+  border: 1px solid var(--text);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  cursor: text;
 
-const MessagesWindow = styled.div`
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  &::-webkit-scrollbar {
-    width: 6px;
+  /* ---- title bar ---- */
+  .bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
   }
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--line);
-    border-radius: 0;
+  .dots {
+    display: flex;
+    gap: 7px;
   }
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
+  .dots i {
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
   }
-`;
+  .title {
+    font-size: var(--fz-xs);
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
 
-const MessageBubble = styled.div`
-  max-width: 85%;
-  padding: 10px 12px;
-  border-radius: 0;
-  font-size: var(--fz-sm);
-  line-height: 1.5;
-  animation: ${fadeIn} 0.2s ease both;
+  /* ---- output ---- */
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px 10px;
+    font-size: var(--fz-sm);
+    line-height: 1.65;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 
-  /* User Styling */
-  ${props =>
-    props.messageType === 'user' &&
-    css`
-      align-self: flex-end;
-      background-color: var(--text);
-      color: var(--bg);
-
-      p {
-        margin: 0;
-      }
-      a {
-        color: inherit;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-    `}
-
-  /* Bot Styling */
-  ${props =>
-    props.messageType === 'bot' &&
-    css`
-      align-self: flex-start;
-      background-color: var(--surface);
-      color: var(--text-secondary);
-
-      /* Markdown Styles */
-      p {
-        margin: 0 0 10px 0;
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-      ul,
-      ol {
-        margin: 0 0 10px 20px;
-        padding: 0;
-      }
-      li {
-        margin-bottom: 5px;
-      }
-      strong {
-        color: var(--text);
-        font-weight: 600;
-      }
-      a {
-        color: var(--text);
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        text-decoration-color: var(--line);
-
-        &:hover {
-          text-decoration-color: var(--text);
-        }
-      }
-      h1,
-      h2,
-      h3,
-      h4 {
-        margin: 15px 0 10px;
-        font-size: 1.1em;
-        font-weight: 600;
-        color: var(--text);
-      }
-      code {
-        font-family: var(--font-mono);
-        font-size: 0.85em;
-        background-color: #ececec;
-        border: 1px solid var(--line);
-        padding: 0.1em 0.4em;
-        color: var(--text);
-      }
-      pre {
-        margin: 0 0 10px 0;
-        padding: 10px 12px;
-        background-color: var(--bg);
-        border: 1px solid var(--line);
-        overflow-x: auto;
-
-        code {
-          background-color: transparent;
-          border: none;
-          padding: 0;
-        }
-      }
-    `}
-
-  /* Typing Indicator */
-  ${props =>
-    props.messageType === 'typing' &&
-    css`
-      align-self: flex-start;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--line);
+    }
+    &::-webkit-scrollbar-track {
       background-color: transparent;
-      padding: 0 2px;
-      font-family: var(--font-mono);
-      letter-spacing: 2px;
-      color: var(--text-muted);
-    `}
-`;
+    }
+  }
 
-const InputArea = styled.form`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background-color: var(--bg);
-  border-top: 1px solid var(--line);
+  .line {
+    word-break: break-word;
+  }
+  .line.user {
+    display: flex;
+    gap: 10px;
+    color: var(--text);
+  }
+  .line.user .cmd {
+    white-space: pre-wrap;
+  }
+  .prompt {
+    color: var(--text-muted);
+    user-select: none;
+  }
 
-  input {
+  .line.bot {
+    color: var(--text-secondary);
+  }
+  .line.bot.greeting {
+    color: var(--text-muted);
+  }
+  .line.bot p {
+    margin: 0 0 8px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .line.bot ul,
+  .line.bot ol {
+    margin: 4px 0 8px;
+    padding-left: 18px;
+  }
+  .line.bot li {
+    margin-bottom: 4px;
+  }
+  .line.bot strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .line.bot a {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: var(--text);
+    }
+  }
+  .line.bot code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    padding: 0.05em 0.35em;
+  }
+  .line.bot pre {
+    margin: 0 0 8px;
+    padding: 10px 12px;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    overflow-x: auto;
+
+    code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+    }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.05em;
+    background-color: var(--text);
+    vertical-align: text-bottom;
+    animation: ${blink} 1s steps(1) infinite;
+  }
+
+  /* ---- prompt line ---- */
+  .input {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--line);
+  }
+  .input input {
     flex: 1;
     background: none;
-    border: none;
-    padding: 8px 0;
+    border: 0;
+    outline: none;
     color: var(--text);
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
     font-size: var(--fz-sm);
-
-    &:focus {
-      outline: none;
-    }
+    caret-color: var(--text);
 
     &::placeholder {
       color: var(--text-muted);
-    }
-  }
-`;
-
-const SendButton = styled.button`
-  ${({ theme }) => theme.mixins.smallButton};
-  flex-shrink: 0;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: default;
-
-    &:hover,
-    &:focus-visible {
-      background-color: transparent;
-      color: var(--text);
     }
   }
 `;
@@ -233,6 +212,7 @@ const ChatSection = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
   // Check if it's the initial mount to prevent auto-scrolling the entire page
   const isFirstRender = useRef(true);
 
@@ -241,7 +221,6 @@ const ChatSection = () => {
   };
 
   useEffect(() => {
-    // Skip scrolling on initial render to avoid page jump
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
@@ -294,7 +273,7 @@ const ChatSection = () => {
         acc += decoder.decode(value, { stream: true });
 
         if (!started) {
-          // First chunk arrived: drop the typing indicator and add the bubble.
+          // First chunk arrived: drop the cursor and add the output line.
           started = true;
           setLoading(false);
           setMessages(prev => [...prev, { role: 'bot', content: acc }]);
@@ -325,42 +304,60 @@ const ChatSection = () => {
   };
 
   return (
-    <StyledChatSection id="chat">
-      <header>
-        <span className="ai-label">AI Assistant</span>
+    <Wrap id="chat">
+      <Header>
+        <span className="label">AI Assistant</span>
         <h1>Ask about my work</h1>
-      </header>
+      </Header>
 
-      <ChatContainer>
-        <MessagesWindow>
-          {messages.map((msg, i) => (
-            <MessageBubble
-              key={i}
-              messageType={msg.role}
-              style={msg.isGreeting ? { opacity: 0.8 } : {}}
-            >
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
-            </MessageBubble>
-          ))}
+      <Terminal onClick={() => inputRef.current?.focus()}>
+        <div className="bar">
+          <span className="dots">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="title">visitor@shaurya — ~/assistant</span>
+        </div>
 
-          {loading && <MessageBubble messageType="typing">…</MessageBubble>}
+        <div className="body">
+          {messages.map((msg, i) =>
+            msg.role === 'user' ? (
+              <div className="line user" key={i}>
+                <span className="prompt">❯</span>
+                <span className="cmd">{msg.content}</span>
+              </div>
+            ) : (
+              <div className={`line bot${msg.isGreeting ? ' greeting' : ''}`} key={i}>
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+              </div>
+            ),
+          )}
+
+          {loading && (
+            <div className="line bot">
+              <span className="cursor" />
+            </div>
+          )}
 
           <div ref={messagesEndRef} />
-        </MessagesWindow>
+        </div>
 
-        <InputArea onSubmit={handleSend}>
+        <form className="input" onSubmit={handleSend}>
+          <span className="prompt">❯</span>
           <input
+            ref={inputRef}
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Ask anything..."
+            placeholder="type a question…"
+            aria-label="Ask the assistant"
+            autoComplete="off"
+            spellCheck="false"
           />
-          <SendButton type="submit" disabled={loading} aria-label="Send Message">
-            Send
-          </SendButton>
-        </InputArea>
-      </ChatContainer>
-    </StyledChatSection>
+        </form>
+      </Terminal>
+    </Wrap>
   );
 };
 
