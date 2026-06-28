@@ -95,6 +95,8 @@ const Hub = styled.button`
   ${nodeBase};
   z-index: 4;
   padding: 8px 16px;
+  /* No opaque box — the rays are trimmed to stop just outside the text. */
+  background: transparent;
 
   .name {
     margin: 0;
@@ -202,28 +204,42 @@ const Timeline = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
-  transform: translateX(-50%);
-  width: min(540px, 88vw);
+  left: 0;
+  right: 0;
   z-index: 3;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   pointer-events: none;
-  animation: tlIn 0.4s ease both;
+  /* Re-centres in the space left of the detail pane instead of being clipped. */
+  transition: right 0.42s cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  .tl-inner {
+    width: min(540px, 86vw);
+    pointer-events: auto;
+  }
 
   @keyframes tlIn {
     from {
       opacity: 0;
-      transform: translate(-50%, 8px);
+      transform: translateY(8px);
     }
     to {
       opacity: 1;
-      transform: translateX(-50%);
+      transform: translateY(0);
     }
   }
 
-  > * {
-    pointer-events: auto;
+  @keyframes tlItemIn {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .tl-head {
@@ -231,6 +247,7 @@ const Timeline = styled.div`
     align-items: baseline;
     justify-content: space-between;
     margin-bottom: 14px;
+    animation: tlIn 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
   }
   .tl-title {
     font-size: var(--fz-xxl);
@@ -278,6 +295,7 @@ const Timeline = styled.div`
     border: 0;
     cursor: pointer;
     padding: 5px 0 11px 26px;
+    animation: tlItemIn 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 
     &:before {
       content: '';
@@ -940,12 +958,33 @@ const GraphHome = () => {
   // Idle: hub at centre, primaries evenly spaced on a ring around it.
   const hubX = w / 2;
   const hubY = centerY;
-  const ringRx = Math.min(w * 0.3, 340);
-  const ringRy = Math.min(h * 0.33, 270);
+  const ringRx = Math.min(w * 0.38, 480);
+  const ringRy = Math.min(h * 0.36, 300);
   const ringPos = g => ({
     x: hubX + ringRx * Math.cos(rad(g.angle)),
     y: hubY + ringRy * Math.sin(rad(g.angle)),
   });
+
+  // A ring line, trimmed so it stops just outside the hub and the node label
+  // (elliptical gaps) — this keeps the rays from being masked into rectangular
+  // "boxes" by the opaque label backgrounds.
+  const ringLine = g => {
+    const p = ringPos(g);
+    const dx = p.x - hubX;
+    const dy = p.y - hubY;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const tHub = 6 + 1 / Math.sqrt((ux / 150) ** 2 + (uy / 92) ** 2);
+    const nrx = g.label.length * 5.2 + 16;
+    const tNode = 8 + 1 / Math.sqrt((ux / nrx) ** 2 + (uy / 30) ** 2);
+    return {
+      x1: hubX + ux * tHub,
+      y1: hubY + uy * tHub,
+      x2: p.x - ux * tNode,
+      y2: p.y - uy * tNode,
+    };
+  };
 
   // Focus: the opened node becomes the "sun" at the centre of the open area
   // and its sub-nodes radiate out as evenly spaced rays of equal length.
@@ -991,20 +1030,15 @@ const GraphHome = () => {
         <Edges aria-hidden="true">
           {!focused &&
             groups.map(g => {
-              const p = ringPos(g);
-              return <line key={g.id} x1={hubX} y1={hubY} x2={p.x} y2={p.y} />;
+              const l = ringLine(g);
+              return <line key={g.id} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} />;
             })}
           {focused &&
             !timelineMode &&
             rayPositions.map(({ sub, x, y }) => (
               <line key={sub.id} className="sub" x1={sunX} y1={sunY} x2={x} y2={y} />
             ))}
-          {!timelineMode && <circle cx={focused ? sunX : hubX} cy={focused ? sunY : hubY} r="3" />}
-          {!focused &&
-            groups.map(g => {
-              const p = ringPos(g);
-              return <circle key={g.id} cx={p.x} cy={p.y} r="2.5" />;
-            })}
+          {focused && !timelineMode && <circle cx={sunX} cy={sunY} r="3" />}
           {focused &&
             !timelineMode &&
             rayPositions.map(({ sub, x, y }) => (
@@ -1076,34 +1110,37 @@ const GraphHome = () => {
           })}
 
         {timelineMode && (
-          <Timeline style={{ left: sunX }}>
-            <div className="tl-head">
-              <span className="tl-title">Experience</span>
-              <button className="tl-close" type="button" onClick={reset}>
-                Close ✕
-              </button>
-            </div>
-            <div className="tl-list">
-              {openGroup.subs.map(sub => {
-                const isActive = activeSub && activeSub.sub.id === sub.id;
-                return (
-                  <button
-                    key={sub.id}
-                    type="button"
-                    className={`tl-item${sub.current ? ' current' : ''}${
-                      isActive ? ' active' : ''
-                    }`}
-                    onClick={() => handleSub(openGroup.id, sub)}
-                  >
-                    <span className="tl-date">
-                      {sub.range}
-                      {sub.current && <span className="tl-now">Now</span>}
-                    </span>
-                    <div className="tl-role">{sub.role}</div>
-                    <div className="tl-company">{sub.company}</div>
-                  </button>
-                );
-              })}
+          <Timeline>
+            <div className="tl-inner">
+              <div className="tl-head">
+                <span className="tl-title">Experience</span>
+                <button className="tl-close" type="button" onClick={reset}>
+                  Close ✕
+                </button>
+              </div>
+              <div className="tl-list">
+                {openGroup.subs.map((sub, i) => {
+                  const isActive = activeSub && activeSub.sub.id === sub.id;
+                  return (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      className={`tl-item${sub.current ? ' current' : ''}${
+                        isActive ? ' active' : ''
+                      }`}
+                      style={{ animationDelay: `${0.1 + i * 0.05}s` }}
+                      onClick={() => handleSub(openGroup.id, sub)}
+                    >
+                      <span className="tl-date">
+                        {sub.range}
+                        {sub.current && <span className="tl-now">Now</span>}
+                      </span>
+                      <div className="tl-role">{sub.role}</div>
+                      <div className="tl-company">{sub.company}</div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </Timeline>
         )}
