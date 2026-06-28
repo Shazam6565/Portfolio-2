@@ -934,6 +934,14 @@ const GraphHome = () => {
 
   const closeSub = useCallback(() => setActiveSub(null), []);
 
+  // Click anywhere on the empty graph area (not a node, sub-node, or pane) to
+  // exit focus and return to the main graph.
+  const handleBackdropClick = e => {
+    if (openId && e.target === e.currentTarget) {
+      reset();
+    }
+  };
+
   useEffect(() => {
     const onKey = e => {
       if (e.key !== 'Escape') {
@@ -1052,7 +1060,7 @@ const GraphHome = () => {
   return (
     <Wrap ref={wrapRef}>
       {/* ---------- Desktop graph ---------- */}
-      <DesktopGraph>
+      <DesktopGraph onClick={handleBackdropClick}>
         <Edges aria-hidden="true">
           {!focused &&
             groups.map(g => {
