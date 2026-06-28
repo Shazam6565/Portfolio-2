@@ -27,7 +27,7 @@ CURRENT ROLE — A.I. Software Engineer, U.S. News & World Report (Aug 2024 – 
 
 EXPERIENCE:
 - C.O.A.P.S (FSU), Software Engineer (May 2023 – May 2024), Tallahassee: Airflow data pipelines (1M+ points), scalable PostgreSQL (10+ TB oceanographic data), Django REST API (2M+ users), React.js + Plotly.js interactive UI.
-- Digital Science Center, FSU, Graduate Research Assistant (Aug 2022 – Apr 2023): PyTorch/TensorFlow deep-learning models; 0.92 F1 / 0.95 AUC-ROC anomaly detection; custom CUDA C++ GPU kernels (-40% time); GPU clustering + HPC (+30% speed).
+- Department of Scientific Computing, FSU, Graduate Research Assistant (Aug 2022 – Apr 2023): PyTorch/TensorFlow deep-learning models; 0.92 F1 / 0.95 AUC-ROC anomaly detection; custom CUDA C++ GPU kernels (-40% time); GPU clustering + HPC (+30% speed).
 - ACS Pvt. Ltd., Junior DevOps Engineer (Jan 2021 – Dec 2021), Mumbai: CI/CD with Jenkins/SonarQube/Docker; AWS EC2/S3/CloudWatch (cut MTTR ~80%).
 - Cart Geek, Web Developer Intern (Jun 2020 – Dec 2020), Mumbai: Azure App Services, ASP.NET Core, Google Cloud Platform.
 

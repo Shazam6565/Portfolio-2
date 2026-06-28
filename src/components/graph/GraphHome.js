@@ -196,6 +196,146 @@ const Sub = styled.button`
   }
 `;
 
+/* Experience is shown as an ordered timeline rather than radial rays, so the
+   career reads as a clear sequence (most recent first). */
+const Timeline = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(540px, 88vw);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+  animation: tlIn 0.4s ease both;
+
+  @keyframes tlIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%);
+    }
+  }
+
+  > * {
+    pointer-events: auto;
+  }
+
+  .tl-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .tl-title {
+    font-size: var(--fz-xxl);
+    font-style: italic;
+    color: var(--text);
+  }
+  .tl-close {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--text);
+    }
+  }
+
+  .tl-list {
+    position: relative;
+    max-height: 72vh;
+    overflow-y: auto;
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 10px;
+      bottom: 14px;
+      width: 1px;
+      background: var(--line);
+    }
+  }
+
+  .tl-item {
+    position: relative;
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 5px 0 11px 26px;
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 11px;
+      height: 11px;
+      border: 1px solid var(--text-muted);
+      border-radius: 50%;
+      background: var(--bg);
+      transition: var(--transition);
+    }
+    &.current:before {
+      background: var(--text);
+      border-color: var(--text);
+    }
+  }
+
+  .tl-date {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    color: var(--text-muted);
+  }
+  .tl-now {
+    padding: 1px 7px;
+    border: 1px solid var(--text);
+    color: var(--text);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .tl-role {
+    margin: 3px 0 1px;
+    font-size: var(--fz-lg);
+    line-height: 1.2;
+    color: var(--text);
+  }
+  .tl-company {
+    font-size: var(--fz-md);
+    line-height: 1.2;
+    color: var(--text-secondary);
+  }
+
+  .tl-item:hover .tl-role,
+  .tl-item:focus-visible .tl-role,
+  .tl-item.active .tl-role {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .tl-item.active .tl-role {
+    font-weight: 600;
+  }
+`;
+
 const Pane = styled.aside`
   position: fixed;
   top: 0;
@@ -475,24 +615,31 @@ const GraphHome = () => {
   );
 
   const groups = useMemo(() => {
-    const jobSubs = jobs.map((n, i) => ({
-      id: `job-${i}`,
-      label: shortCompany(n.frontmatter.company),
-      title: n.frontmatter.title,
-      body: (
-        <>
-          <Meta>
-            {n.frontmatter.company} · {n.frontmatter.range}
-          </Meta>
-          <div className="rich" dangerouslySetInnerHTML={{ __html: n.html }} />
-          {n.frontmatter.url && (
-            <Links>
-              <a {...ext(n.frontmatter.url)}>{shortCompany(n.frontmatter.company)} ↗</a>
-            </Links>
-          )}
-        </>
-      ),
-    }));
+    const jobSubs = jobs.map((n, i) => {
+      const current = /current|present/i.test(n.frontmatter.range || '');
+      return {
+        id: `job-${i}`,
+        label: `${n.frontmatter.company}${current ? ' · Now' : ''}`,
+        company: n.frontmatter.company,
+        role: n.frontmatter.title,
+        range: n.frontmatter.range,
+        current,
+        title: n.frontmatter.title,
+        body: (
+          <>
+            <Meta>
+              {n.frontmatter.company} · {n.frontmatter.range}
+            </Meta>
+            <div className="rich" dangerouslySetInnerHTML={{ __html: n.html }} />
+            {n.frontmatter.url && (
+              <Links>
+                <a {...ext(n.frontmatter.url)}>{shortCompany(n.frontmatter.company)} ↗</a>
+              </Links>
+            )}
+          </>
+        ),
+      };
+    });
 
     const projSubs = featured.map((n, i) => ({
       id: `proj-${i}`,
@@ -824,6 +971,9 @@ const GraphHome = () => {
 
   const activeGroup = activeSub && groups.find(g => g.id === activeSub.groupId);
 
+  // Experience renders as a sequential timeline instead of radial rays.
+  const timelineMode = focused && openId === 'experience';
+
   const primaryState = g => {
     if (!focused) {
       return { ...ringPos(g), opacity: 1, on: true };
@@ -845,16 +995,18 @@ const GraphHome = () => {
               return <line key={g.id} x1={hubX} y1={hubY} x2={p.x} y2={p.y} />;
             })}
           {focused &&
+            !timelineMode &&
             rayPositions.map(({ sub, x, y }) => (
               <line key={sub.id} className="sub" x1={sunX} y1={sunY} x2={x} y2={y} />
             ))}
-          <circle cx={focused ? sunX : hubX} cy={focused ? sunY : hubY} r="3" />
+          {!timelineMode && <circle cx={focused ? sunX : hubX} cy={focused ? sunY : hubY} r="3" />}
           {!focused &&
             groups.map(g => {
               const p = ringPos(g);
               return <circle key={g.id} cx={p.x} cy={p.y} r="2.5" />;
             })}
           {focused &&
+            !timelineMode &&
             rayPositions.map(({ sub, x, y }) => (
               <circle key={`dot-${sub.id}`} className="sub" cx={x} cy={y} r="2.5" />
             ))}
@@ -889,8 +1041,8 @@ const GraphHome = () => {
               style={{
                 left: st.x,
                 top: st.y,
-                opacity: st.opacity,
-                pointerEvents: st.on ? 'auto' : 'none',
+                opacity: timelineMode ? 0 : st.opacity,
+                pointerEvents: st.on && !timelineMode ? 'auto' : 'none',
               }}
               onClick={() => handlePrimary(g.id)}
               aria-expanded={openId === g.id}
@@ -902,6 +1054,7 @@ const GraphHome = () => {
         })}
 
         {focused &&
+          !timelineMode &&
           rayPositions.map(({ sub, x, y }, i) => {
             const isActive = activeSub && activeSub.sub.id === sub.id;
             return (
@@ -921,6 +1074,39 @@ const GraphHome = () => {
               </Sub>
             );
           })}
+
+        {timelineMode && (
+          <Timeline style={{ left: sunX }}>
+            <div className="tl-head">
+              <span className="tl-title">Experience</span>
+              <button className="tl-close" type="button" onClick={reset}>
+                Close ✕
+              </button>
+            </div>
+            <div className="tl-list">
+              {openGroup.subs.map(sub => {
+                const isActive = activeSub && activeSub.sub.id === sub.id;
+                return (
+                  <button
+                    key={sub.id}
+                    type="button"
+                    className={`tl-item${sub.current ? ' current' : ''}${
+                      isActive ? ' active' : ''
+                    }`}
+                    onClick={() => handleSub(openGroup.id, sub)}
+                  >
+                    <span className="tl-date">
+                      {sub.range}
+                      {sub.current && <span className="tl-now">Now</span>}
+                    </span>
+                    <div className="tl-role">{sub.role}</div>
+                    <div className="tl-company">{sub.company}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </Timeline>
+        )}
       </DesktopGraph>
 
       {/* ---------- Mobile fallback ---------- */}
@@ -932,7 +1118,7 @@ const GraphHome = () => {
             Tiwari
           </h1>
         </div>
-        <div className="m-role">AI Software Engineer</div>
+        <div className="m-role">Production AI → Physical AI</div>
         {groups.map(g =>
           g.to ? (
             <Link key={g.id} className="m-link" to={g.to}>
