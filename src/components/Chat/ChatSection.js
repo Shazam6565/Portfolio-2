@@ -289,7 +289,7 @@ const ChatSection = () => {
       if (!started) {
         setMessages(prev => [
           ...prev,
-          { role: 'bot', content: 'Sorry, I didn\'t catch that — please try again.' },
+          { role: 'bot', content: 'Sorry, I didn\'t catch that. Please try again.' },
         ]);
       }
     } catch (error) {

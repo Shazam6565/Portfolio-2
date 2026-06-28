@@ -5,10 +5,10 @@ github: 'NDA'
 external: 'https://ai.usnews.com/'
 tech:
   - LangChain/LangGraph
-  - Proprietory Models
-  - Open-Source Evaluation Tools - Phoenix
+  - Proprietary Models
+  - Phoenix Evals
 company: 'U.S. News & World Report'
 showInProjects: true
 ---
 
-This project involved the development of an academic insights assistant using LangChain/LangGraph, proprietary models, and open-source evaluation tools - Phoenix. The assistant was designed to provide insights and analysis based on academic research and metrics data from Academic Insights API and was built to be used as a tool for academic research and analysis.
+A production agentic RAG assistant for the U.S. News Education platform, built with LangChain/LangGraph, proprietary models, and open-source evaluation tools like Phoenix. It answers questions and runs analysis over academic research and metrics from the Academic Insights API.

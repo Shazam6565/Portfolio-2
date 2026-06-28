@@ -12,6 +12,6 @@ tech:
   - Python
 ---
 
-Built the assistant that powers this site — letting recruiters and engineers ask about my work, projects, skills, and career direction in natural language.
+Built the assistant that powers this site, so recruiters and engineers can ask about my work, projects, skills, and career direction in natural language.
 
 It runs on a serverless backend that streams responses token-by-token, grounded in my own career and project data with a constrained response layer, so visitors can explore my background conversationally instead of reading every page.

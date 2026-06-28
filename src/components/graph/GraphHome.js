@@ -17,7 +17,7 @@ const shortCompany = c => c.split(' & ')[0].split(' at ')[0].split(',')[0].trim(
 const PROJECT_LABELS = {
   'Academic Insights AI Assistant': 'Academic Insights AI',
   'Personalized Portfolio AI Assistant': 'Portfolio Assistant',
-  'Transformer -Text Completion Model': 'Transformer Text Model',
+  'Transformer Text Completion Model': 'Transformer Text Model',
   'POView — Autonomous Urban Intelligence': 'POView',
 };
 const projectLabel = t => PROJECT_LABELS[t] || t;
@@ -474,6 +474,28 @@ const Tech = styled.p`
   }
 `;
 
+/* Skills grouped by category, stacked vertically (no horizontal run-on). */
+const SkillGroups = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-top: 4px;
+
+  .grp__label {
+    display: block;
+    margin-bottom: 3px;
+    font-family: var(--font-mono);
+    font-size: var(--fz-xxs);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .grp__items {
+    font-size: var(--fz-md);
+    color: var(--text-secondary);
+  }
+`;
+
 const Links = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -699,21 +721,21 @@ const GraphHome = () => {
                   Science from Florida State University.
                 </p>
                 <p>
-                  I build production AI infrastructure at{' '}
-                  <a {...ext('https://www.usnews.com/')}>U.S. News &amp; World Report</a> — agentic
-                  RAG systems, backend platforms, vector retrieval, streaming APIs, guardrails, and
-                  observability for AI products used across multiple business verticals.
+                  At <a {...ext('https://www.usnews.com/')}>U.S. News &amp; World Report</a> I build
+                  production AI infrastructure: agentic RAG systems, backend platforms, vector
+                  retrieval, streaming APIs, guardrails, and observability for AI products used
+                  across several business verticals.
                 </p>
                 <p>
-                  My current technical direction is Physical AI. I&apos;m applying that same
-                  production-engineering background to simulation workflows, OpenUSD-based scene and
-                  data pipelines, robot-policy evaluation, and closed-loop retraining systems
-                  through <a {...ext('https://instrux.world/')}>InstruX</a>.
+                  My focus now is Physical AI. I&apos;m taking that same backend and systems
+                  experience into simulation workflows, OpenUSD scene and data pipelines,
+                  robot-policy evaluation, and closed-loop retraining, through{' '}
+                  <a {...ext('https://instrux.world/')}>InstruX</a>.
                 </p>
                 <p>
-                  Earlier I worked across data engineering, research, DevOps, and web platforms —
-                  which gave me the backend, ML, infrastructure, and product judgment I bring into
-                  AI systems today.
+                  Before this I worked across data engineering, research, DevOps, and web platforms,
+                  which is where I picked up the backend, ML, and infrastructure judgment I lean on
+                  today.
                 </p>
               </>
             ),
@@ -724,28 +746,33 @@ const GraphHome = () => {
             title: 'Toolbox',
             body: (
               <>
-                <p>The stack I use to build AI systems that ship:</p>
-                <Tech>
+                <p>The stack I reach for, by area:</p>
+                <SkillGroups>
                   {[
-                    'Python',
-                    'Django',
-                    'FastAPI',
-                    'LangChain',
-                    'LangGraph',
-                    'RAG',
-                    'OpenSearch',
-                    'FAISS',
-                    'PostgreSQL',
-                    'AWS',
-                    'Docker',
-                    'New Relic',
-                    'PyTorch',
-                    'OpenUSD',
-                    'NVIDIA Omniverse',
-                  ].map(t => (
-                    <span key={t}>{t}</span>
+                    { label: 'Languages', items: ['Python', 'TypeScript', 'C++'] },
+                    {
+                      label: 'AI & agents',
+                      items: ['LangChain', 'LangGraph', 'RAG', 'PyTorch', 'TensorFlow'],
+                    },
+                    {
+                      label: 'Backend & data',
+                      items: ['Django', 'FastAPI', 'PostgreSQL', 'OpenSearch', 'FAISS'],
+                    },
+                    {
+                      label: 'Infrastructure',
+                      items: ['AWS', 'Docker', 'Jenkins', 'New Relic'],
+                    },
+                    {
+                      label: 'Physical AI & simulation',
+                      items: ['OpenUSD', 'NVIDIA Omniverse', 'Isaac Sim', 'ROS2'],
+                    },
+                  ].map(g => (
+                    <div key={g.label}>
+                      <span className="grp__label">{g.label}</span>
+                      <span className="grp__items">{g.items.join(' · ')}</span>
+                    </div>
                   ))}
-                </Tech>
+                </SkillGroups>
               </>
             ),
           },
@@ -787,10 +814,9 @@ const GraphHome = () => {
                   evaluation come together into closed-loop workflows for real-world robotics.
                 </p>
                 <p>
-                  The focus isn&apos;t hardware or generic AI demos — it&apos;s the infrastructure
-                  for diagnosing policy failures, generating targeted simulation scenarios,
-                  validating deployment readiness, and triggering retraining when deployed systems
-                  drift.
+                  The focus isn&apos;t hardware or flashy demos. It&apos;s the infrastructure that
+                  diagnoses policy failures, generates targeted simulation scenarios, checks
+                  deployment readiness, and retrains models when they drift in the field.
                 </p>
                 <Tech>
                   {[
@@ -867,7 +893,7 @@ const GraphHome = () => {
               <>
                 <p>
                   I built this assistant so recruiters and engineers can explore my background
-                  conversationally — from production AI infrastructure and LangGraph systems to my
+                  conversationally, from production AI infrastructure and LangGraph systems to my
                   current work in Physical AI and simulation workflows.
                 </p>
                 <Links>
