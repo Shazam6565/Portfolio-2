@@ -41,6 +41,27 @@ const StyledChrome = styled.div`
     }
   }
 
+  .chrome-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .resume-link {
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
   .spacer {
     width: 1px;
   }
@@ -97,7 +118,12 @@ const Layout = ({ children, location }) => {
                 ← shaurya tiwari
               </Link>
             )}
-            <ThemeToggle />
+            <div className="chrome-right">
+              <Link className="resume-link" to="/resume">
+                Résumé
+              </Link>
+              <ThemeToggle />
+            </div>
           </StyledChrome>
 
           {isHome ? (
