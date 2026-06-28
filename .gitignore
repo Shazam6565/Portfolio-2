@@ -17,3 +17,7 @@ package-lock.json
 
 # Local MCP puppeteer session logs
 logs/mcp-puppeteer-*.log
+
+# Local Netlify folder
+.netlify
+deno.lock
