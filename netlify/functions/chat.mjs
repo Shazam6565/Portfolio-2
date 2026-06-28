@@ -16,9 +16,8 @@ const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const BACKGROUND = `
 PERSON: Shaurya Tiwari — AI Software Engineer.
 EDUCATION: Master's in Computer Science, Florida State University.
-SUMMARY: Builds production AI infrastructure across 9+ verticals at U.S. News &
-World Report. Strengths: reliable backends, RAG/agentic systems, data-driven AI
-applications, and systems where correctness and performance matter.
+POSITIONING: A production AI infrastructure engineer moving into Physical AI / simulation systems. The arc is production AI → agentic systems → Physical AI / simulation infrastructure. He does NOT position himself as a robotics or hardware engineer — the angle is AI infrastructure, agentic orchestration, and simulation/evaluation tooling.
+SUMMARY: Builds production AI infrastructure at U.S. News & World Report across multiple business verticals — agentic RAG systems, backend platforms, vector retrieval, streaming APIs, guardrails, evaluation, and observability. He is now applying that same systems discipline to Physical AI: simulation workflows, OpenUSD scene/data pipelines, robot-policy evaluation, and closed-loop retraining through InstruX.
 
 CURRENT ROLE — A.I. Software Engineer, U.S. News & World Report (Aug 2024 – present), New York:
 - Architected and maintains ByteSage, an enterprise AI backend platform in Django serving multiple AI products across U.S. News verticals.
@@ -33,13 +32,14 @@ EXPERIENCE:
 - Cart Geek, Web Developer Intern (Jun 2020 – Dec 2020), Mumbai: Azure App Services, ASP.NET Core, Google Cloud Platform.
 
 PROJECTS:
-- Academic Insights AI Assistant (at U.S. News) — RAG, LangChain, open-source LLMs, Python. Live at ai.usnews.com.
-- Personalized LLM Chatbot — RAG, LangChain, open-source LLM, Python.
+- Academic Insights AI Assistant (at U.S. News) — production agentic RAG over education datasets; LangChain/LangGraph orchestration, OpenSearch vector retrieval, streaming responses, NeMo Guardrails. Live at ai.usnews.com.
+- Personalized Portfolio AI Assistant — the assistant powering this site; a serverless streaming backend grounded in his career and project data.
 - Transformer — Text Completion Model — a transformer/GPT-style model from scratch; Python, PyTorch, TensorFlow, C++ (GPU).
 - Educational YouTube Channel — ML, generative AI, OpenAI API, teaching.
-- Physical AI — instrux.world (early/ongoing; more details coming soon).
 
-SKILLS: Python, Django, LangChain/LangGraph, RAG, AWS, Docker, PostgreSQL, PyTorch, TensorFlow, React, CI/CD (Jenkins), New Relic.
+PHYSICAL AI (his current direction, via InstruX — instrux.world): applying production AI engineering to the robotics policy lifecycle — diagnosing policy failures, generating targeted simulation scenarios, validating deployment readiness, and triggering retraining when deployed systems drift. InstruX is a decision/orchestration layer above Isaac Sim, Isaac Lab, Cosmos, Omniverse, OpenUSD, and ROS2.
+
+SKILLS: Python, Django, FastAPI, LangChain/LangGraph, RAG, OpenSearch, FAISS, vector retrieval, streaming APIs, guardrails/evaluation/observability, AWS, Docker, PostgreSQL, PyTorch, TensorFlow, React, CI/CD (Jenkins), New Relic. Physical AI / simulation: OpenUSD, NVIDIA Omniverse, Isaac Sim, Isaac Lab, Cosmos, ROS2.
 
 CONTACT: email vaasutiwari@gmail.com · Calendly calendly.com/vaasutiwari · résumé at /resume · LinkedIn & GitHub linked on the site.
 `.trim();

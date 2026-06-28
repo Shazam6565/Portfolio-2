@@ -226,7 +226,7 @@ const ChatSection = () => {
     {
       role: 'bot',
       content:
-        'Hello, I\'m Shaurya\'s assistant. Ask me anything about him or his career to know him better.',
+        'Hi, I\'m Shaurya\'s portfolio assistant. Ask me about his production AI work, agentic systems, projects, his move into Physical AI, or how he\'d approach a technical problem.',
       isGreeting: true,
     },
   ]);
@@ -328,7 +328,7 @@ const ChatSection = () => {
     <StyledChatSection id="chat">
       <header>
         <span className="ai-label">AI Assistant</span>
-        <h1>Ask me anything</h1>
+        <h1>Ask about my work</h1>
       </header>
 
       <ChatContainer>

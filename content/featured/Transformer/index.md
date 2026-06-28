@@ -11,6 +11,6 @@ tech:
   - C++ [GPU]
 ---
 
-Developed a text completion model in Python from scratch using the Transformer architecture, inspired by the groundbreaking [Attention Is All You Need](https://arxiv.org/abs/1706.03762) research paper. This work forms the core foundation of large language models (LLMs) such as GPT-3, BERT, and BART.
+Implemented a text-completion model from scratch in Python using the Transformer architecture, inspired by [Attention Is All You Need](https://arxiv.org/abs/1706.03762).
 
-
+Building it end-to-end — tokenization, attention, embeddings, training loops, inference, and GPU-aware execution — grounded my understanding of the mechanics behind modern LLMs like GPT, BERT, and BART.

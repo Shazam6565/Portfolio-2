@@ -16,7 +16,7 @@ const shortCompany = c => c.split(' & ')[0].split(' at ')[0].split(',')[0].trim(
    titles were getting truncated into "…" around the graph. */
 const PROJECT_LABELS = {
   'Academic Insights AI Assistant': 'Academic Insights AI',
-  'LLM Powered personalized Chatbot': 'Personalized LLM Chatbot',
+  'Personalized Portfolio AI Assistant': 'Portfolio Assistant',
   'Transformer -Text Completion Model': 'Transformer Text Model',
   'Educational YouTube Channel': 'Educational YouTube',
 };
@@ -530,16 +530,25 @@ const GraphHome = () => {
               <>
                 {profilePhoto}
                 <p>
-                  I&apos;m Shaurya Tiwari, an AI software engineer with a Master&apos;s in Computer
-                  Science from Florida State University. I build production AI infrastructure across
-                  9+ verticals at{' '}
-                  <a {...ext('https://www.usnews.com/')}>U.S. News &amp; World Report</a> — reliable
-                  backends, data-driven AI applications, and systems where correctness and
-                  performance actually matter.
+                  I&apos;m Shaurya Tiwari, an AI Software Engineer with a Master&apos;s in Computer
+                  Science from Florida State University.
                 </p>
                 <p>
-                  Earlier I worked at a data-product organization, a research department at FSU, a
-                  software consultancy, and a UI/UX studio.
+                  I build production AI infrastructure at{' '}
+                  <a {...ext('https://www.usnews.com/')}>U.S. News &amp; World Report</a> — agentic
+                  RAG systems, backend platforms, vector retrieval, streaming APIs, guardrails, and
+                  observability for AI products used across multiple business verticals.
+                </p>
+                <p>
+                  My current technical direction is Physical AI. I&apos;m applying that same
+                  production-engineering background to simulation workflows, OpenUSD-based scene and
+                  data pipelines, robot-policy evaluation, and closed-loop retraining systems
+                  through <a {...ext('https://instrux.world/')}>InstruX</a>.
+                </p>
+                <p>
+                  Earlier I worked across data engineering, research, DevOps, and web platforms —
+                  which gave me the backend, ML, infrastructure, and product judgment I bring into
+                  AI systems today.
                 </p>
               </>
             ),
@@ -550,16 +559,24 @@ const GraphHome = () => {
             title: 'Toolbox',
             body: (
               <>
-                <p>The tools I reach for most often:</p>
+                <p>The stack I use to build AI systems that ship:</p>
                 <Tech>
                   {[
                     'Python',
                     'Django',
-                    'LangChain/LangGraph',
+                    'FastAPI',
+                    'LangChain',
+                    'LangGraph',
+                    'RAG',
+                    'OpenSearch',
+                    'FAISS',
+                    'PostgreSQL',
                     'AWS',
                     'Docker',
                     'New Relic',
-                    'Jenkins',
+                    'PyTorch',
+                    'OpenUSD',
+                    'NVIDIA Omniverse',
                   ].map(t => (
                     <span key={t}>{t}</span>
                   ))}
@@ -591,7 +608,47 @@ const GraphHome = () => {
         label: 'Physical AI',
         num: 'V',
         angle: 90,
-        subs: [{ id: 'instrux', label: 'instrux.world', href: 'https://instrux.world/' }],
+        subs: [
+          {
+            id: 'physical-ai-overview',
+            label: 'Overview',
+            title: 'Physical AI',
+            body: (
+              <>
+                <p>
+                  Physical AI is the next technical direction I&apos;m building toward. Through{' '}
+                  <a {...ext('https://instrux.world/')}>InstruX</a>, I&apos;m exploring how
+                  production AI systems, agent orchestration, simulation tooling, and robot-policy
+                  evaluation come together into closed-loop workflows for real-world robotics.
+                </p>
+                <p>
+                  The focus isn&apos;t hardware or generic AI demos — it&apos;s the infrastructure
+                  for diagnosing policy failures, generating targeted simulation scenarios,
+                  validating deployment readiness, and triggering retraining when deployed systems
+                  drift.
+                </p>
+                <Tech>
+                  {[
+                    'OpenUSD',
+                    'NVIDIA Omniverse',
+                    'Isaac Sim',
+                    'Isaac Lab',
+                    'Cosmos',
+                    'ROS2',
+                    'Simulation Workflows',
+                    'Agentic Orchestration',
+                  ].map(t => (
+                    <span key={t}>{t}</span>
+                  ))}
+                </Tech>
+                <Links>
+                  <a {...ext('https://instrux.world/')}>Visit InstruX ↗</a>
+                </Links>
+              </>
+            ),
+          },
+          { id: 'instrux', label: 'instrux.world', href: 'https://instrux.world/' },
+        ],
       },
       {
         id: 'contact',
@@ -644,9 +701,9 @@ const GraphHome = () => {
             body: (
               <>
                 <p>
-                  I trained a small assistant on my résumé, projects, and career so you can
-                  interview me in natural language — ask about a role, a technology, or how I&apos;d
-                  approach a problem.
+                  I built this assistant so recruiters and engineers can explore my background
+                  conversationally — from production AI infrastructure and LangGraph systems to my
+                  current work in Physical AI and simulation workflows.
                 </p>
                 <Links>
                   <Link to="/chat">Open the assistant →</Link>
@@ -819,7 +876,7 @@ const GraphHome = () => {
             Tiwari
           </h1>
           <div className="rule" />
-          <div className="role">AI Software Engineer</div>
+          <div className="role">Production AI → Physical AI</div>
         </Hub>
 
         {groups.map(g => {
