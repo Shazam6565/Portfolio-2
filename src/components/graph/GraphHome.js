@@ -18,7 +18,7 @@ const PROJECT_LABELS = {
   'Academic Insights AI Assistant': 'Academic Insights AI',
   'Personalized Portfolio AI Assistant': 'Portfolio Assistant',
   'Transformer -Text Completion Model': 'Transformer Text Model',
-  'Educational YouTube Channel': 'Educational YouTube',
+  'POView — Autonomous Urban Intelligence': 'POView',
 };
 const projectLabel = t => PROJECT_LABELS[t] || t;
 

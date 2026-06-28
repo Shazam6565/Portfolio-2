@@ -35,7 +35,8 @@ PROJECTS:
 - Academic Insights AI Assistant (at U.S. News) — production agentic RAG over education datasets; LangChain/LangGraph orchestration, OpenSearch vector retrieval, streaming responses, NeMo Guardrails. Live at ai.usnews.com.
 - Personalized Portfolio AI Assistant — the assistant powering this site; a serverless streaming backend grounded in his career and project data.
 - Transformer — Text Completion Model — a transformer/GPT-style model from scratch; Python, PyTorch, TensorFlow, C++ (GPU).
-- Educational YouTube Channel — ML, generative AI, OpenAI API, teaching.
+- POView — Autonomous Urban Intelligence: agentic geospatial intelligence on a CesiumJS 3D globe, using Google ADK agents and the Gemini Live API over a Python FastAPI backend (Next.js/TypeScript).
+- Educational YouTube Channel — ML, generative AI, OpenAI API, teaching (a side project; see "Beyond work").
 
 PHYSICAL AI (his current direction, via InstruX — instrux.world): applying production AI engineering to the robotics policy lifecycle — diagnosing policy failures, generating targeted simulation scenarios, validating deployment readiness, and triggering retraining when deployed systems drift. InstruX is a decision/orchestration layer above Isaac Sim, Isaac Lab, Cosmos, Omniverse, OpenUSD, and ROS2.
 
