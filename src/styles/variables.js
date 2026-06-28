@@ -29,7 +29,7 @@ const variables = css`
     --blue: var(--text);
 
     /* ---- Type ---- */
-    --font-serif: 'EB Garamond', Georgia, 'Times New Roman', Times, serif;
+    --font-serif: 'Scheherazade New', Georgia, 'Times New Roman', Times, serif;
     --font-sans: var(--font-serif);
     --font-mono: ui-monospace, 'SF Mono', 'Fira Code', 'Roboto Mono', Menlo, monospace;
 

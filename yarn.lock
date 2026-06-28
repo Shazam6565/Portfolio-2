@@ -1213,6 +1213,11 @@
   resolved "https://registry.npmjs.org/@fontsource/eb-garamond/-/eb-garamond-5.2.7.tgz"
   integrity sha512-V42tTlHDbnDo0+lENnXKWMx63Llq6Gfl2l7ozkoeRQN60S0jm6hEgCLlOT/5YyKAN9QZ0e2ofpy0rGKlz9jBrw==
 
+"@fontsource/scheherazade-new@^5.2.9":
+  version "5.2.9"
+  resolved "https://registry.npmjs.org/@fontsource/scheherazade-new/-/scheherazade-new-5.2.9.tgz"
+  integrity sha512-czyaFAValINxIo8g81uc+vn1U6Yls/T945TcMHmjMaKev/B5WKc4OHpet7UfM1t0S5j/IeV7Bl2zT0lE7CDTBQ==
+
 "@gatsbyjs/parcel-namer-relative-to-cwd@2.15.0":
   version "2.15.0"
   resolved "https://registry.npmjs.org/@gatsbyjs/parcel-namer-relative-to-cwd/-/parcel-namer-relative-to-cwd-2.15.0.tgz"

@@ -218,11 +218,15 @@ const GlobalStyle = createGlobalStyle`
     cursor: pointer;
     border: 0;
     border-radius: 0;
+    /* Form controls don't inherit the body font by default — force it so the
+       graph nodes and other buttons use the site typeface, not UA Arial. */
+    font-family: inherit;
   }
 
   input, textarea {
     border-radius: 0;
     outline: 0;
+    font-family: inherit;
 
     &:focus {
       outline: 0;
