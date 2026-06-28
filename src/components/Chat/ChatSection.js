@@ -1,284 +1,202 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled, { keyframes, css } from 'styled-components';
-import axios from 'axios';
+import styled, { keyframes } from 'styled-components';
 import ReactMarkdown from 'react-markdown';
 
-const fadeInUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+const blink = keyframes`
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 `;
 
-const dotPulse = keyframes`
-  0% { opacity: 0.5; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.1); }
-  100% { opacity: 0.5; transform: scale(0.8); }
-`;
-
-const StyledChatSection = styled.section`
-  ${({ theme }) => theme.mixins.flexCenter};
-  flex-direction: column;
-  width: 75vw;
-  max-width: 1400px;
-  margin: 0 auto 100px;
-  padding: 0 20px;
-  position: relative;
-  min-height: 50vh;
-
-  header {
-    width: 100%;
-    margin-bottom: 30px;
-    position: relative;
-    text-align: center;
-
-    /* AI Label positioned absolutely top-right of the header area, or inline if preferred minimal */
-    .ai-label {
-      position: absolute;
-      top: -20px;
-      right: 0;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--green);
-      opacity: 0.6;
-      border: 1px solid var(--green);
-      padding: 2px 8px;
-      border-radius: 4px;
-
-      @media (max-width: 480px) {
-        position: static;
-        display: inline-block;
-        margin-bottom: 15px;
-      }
-    }
-
-    h2 {
-      font-family: var(--font-sans);
-      font-size: clamp(32px, 5vw, 42px);
-      font-weight: 600;
-      color: var(--lightest-slate);
-      line-height: 1.1;
-      margin: 0;
-    }
-  }
-`;
-
-const ChatContainer = styled.div`
+const Wrap = styled.section`
   width: 100%;
-  height: 75vh;
-  background-color: rgba(17, 34, 64, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+`;
+
+const Header = styled.header`
+  margin-bottom: 22px;
+
+  .label {
+    display: block;
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: var(--fz-heading);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--text);
+  }
+`;
+
+const Terminal = styled.div`
+  width: 100%;
+  height: 66vh;
+  min-height: 380px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  position: relative;
+  border: 1px solid var(--text);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  cursor: text;
 
-  /* Subtle Pattern Overlay */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: radial-gradient(var(--slate) 1px, transparent 1px);
-    background-size: 20px 20px;
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 0;
+  /* ---- title bar ---- */
+  .bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
   }
-`;
-
-const MessagesWindow = styled.div`
-  flex: 1;
-  padding: 30px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  position: relative;
-  z-index: 1;
-
-  /* Scrollbar styling */
-  &::-webkit-scrollbar {
-    width: 6px;
+  .dots {
+    display: flex;
+    gap: 7px;
   }
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--dark-slate);
-    border-radius: 10px;
+  .dots i {
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
   }
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
+  .title {
+    font-size: var(--fz-xs);
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
   }
-`;
 
-const MessageBubble = styled.div`
-  max-width: 85%;
-  padding: 14px 18px;
-  border-radius: 18px;
-  font-size: var(--fz-md);
-  line-height: 1.6;
-  position: relative;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  animation: ${fadeInUp} 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-
-  /* User Styling */
-  ${props =>
-    props.messageType === 'user' &&
-    css`
-      align-self: flex-end;
-      background-color: var(--green);
-      color: var(--navy);
-      border-bottom-right-radius: 4px;
-
-      p {
-        margin: 0;
-      }
-    `}
-
-  /* Bot Styling */
-  ${props =>
-    props.messageType === 'bot' &&
-    css`
-      align-self: flex-start;
-      background-color: var(--light-navy);
-      color: var(--lightest-slate);
-      border-bottom-left-radius: 4px;
-      border: 1px solid var(--light-slate);
-
-      /* Markdown Styles */
-      p {
-        margin: 0 0 10px 0;
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-      ul,
-      ol {
-        margin: 0 0 10px 20px;
-        padding: 0;
-      }
-      li {
-        margin-bottom: 5px;
-      }
-      strong {
-        color: var(--green);
-        font-weight: 600;
-      }
-      a {
-        color: var(--green);
-        text-decoration: underline;
-        &:hover {
-          text-decoration: none;
-        }
-      }
-      h1,
-      h2,
-      h3,
-      h4 {
-        margin: 15px 0 10px;
-        font-size: 1.1em;
-        color: var(--white);
-      }
-    `}
-
-  /* Typing Indicator Special Styling */
-  ${props =>
-    props.messageType === 'typing' &&
-    css`
-      align-self: flex-start;
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      padding: 0;
-      margin-left: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    `}
-`;
-
-const TypingDot = styled.span`
-  width: 8px;
-  height: 8px;
-  background-color: var(--slate);
-  border-radius: 50%;
-  display: inline-block;
-  animation: ${dotPulse} 1.4s infinite ease-in-out both;
-  animation-delay: ${props => props.delay || '0s'};
-`;
-
-const InputArea = styled.form`
-  display: flex;
-  align-items: flex-end;
-  gap: 15px;
-  padding: 20px 30px;
-  background-color: rgba(10, 25, 47, 0.8);
-  position: relative;
-  z-index: 2;
-
-  input {
+  /* ---- output ---- */
+  .body {
     flex: 1;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 12px 0;
-    color: var(--lightest-slate);
-    font-family: var(--font-sans);
-    font-size: var(--fz-md);
-    transition: all 0.2s ease;
+    overflow-y: auto;
+    padding: 16px 16px 10px;
+    font-size: var(--fz-sm);
+    line-height: 1.65;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 
-    &:focus {
-      outline: none;
-      border-bottom: 1px solid var(--green);
-      box-shadow: 0 1px 0 0 var(--green);
+    &::-webkit-scrollbar {
+      width: 8px;
     }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--line);
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  }
+
+  .line {
+    word-break: break-word;
+  }
+  .line.user {
+    display: flex;
+    gap: 10px;
+    color: var(--text);
+  }
+  .line.user .cmd {
+    white-space: pre-wrap;
+  }
+  .prompt {
+    color: var(--text-muted);
+    user-select: none;
+  }
+
+  .line.bot {
+    color: var(--text-secondary);
+  }
+  .line.bot.greeting {
+    color: var(--text-muted);
+  }
+  .line.bot p {
+    margin: 0 0 8px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .line.bot ul,
+  .line.bot ol {
+    margin: 4px 0 8px;
+    padding-left: 18px;
+  }
+  .line.bot li {
+    margin-bottom: 4px;
+  }
+  .line.bot strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .line.bot a {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: var(--text);
+    }
+  }
+  .line.bot code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    padding: 0.05em 0.35em;
+  }
+  .line.bot pre {
+    margin: 0 0 8px;
+    padding: 10px 12px;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    overflow-x: auto;
+
+    code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+    }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.05em;
+    background-color: var(--text);
+    vertical-align: text-bottom;
+    animation: ${blink} 1s steps(1) infinite;
+  }
+
+  /* ---- prompt line ---- */
+  .input {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--line);
+  }
+  .input input {
+    flex: 1;
+    background: none;
+    border: 0;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: var(--fz-sm);
+    caret-color: var(--text);
 
     &::placeholder {
-      color: var(--slate);
-      opacity: 0.7;
+      color: var(--text-muted);
     }
-  }
-`;
-
-const SendButton = styled.button`
-  background-color: var(--green);
-  color: var(--navy);
-  border: none;
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 4px 10px rgba(100, 255, 218, 0.2);
-
-  &:hover {
-    transform: scale(1.05);
-    background-color: var(--green);
-    box-shadow: 0 6px 15px rgba(100, 255, 218, 0.3);
-  }
-  &:disabled {
-    background-color: var(--slate);
-    cursor: default;
-    transform: none;
-    box-shadow: none;
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
-    margin-left: 2px; /* Visual balance for arrow */
   }
 `;
 
@@ -287,13 +205,14 @@ const ChatSection = () => {
     {
       role: 'bot',
       content:
-        'Hello, I\'m Shaurya\'s assistant. Ask me anything about him or his career to know him better.',
+        'Hi, I\'m Shaurya\'s portfolio assistant. Ask me about his production AI work, agentic systems, projects, his move into Physical AI, or how he\'d approach a technical problem.',
       isGreeting: true,
     },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
   // Check if it's the initial mount to prevent auto-scrolling the entire page
   const isFirstRender = useRef(true);
 
@@ -302,7 +221,6 @@ const ChatSection = () => {
   };
 
   useEffect(() => {
-    // Skip scrolling on initial render to avoid page jump
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
@@ -317,22 +235,63 @@ const ChatSection = () => {
     }
 
     const userMsg = { role: 'user', content: input };
+
+    // Recent turns for context (mapped to the API's role names).
+    const history = messages
+      .filter(m => m.role === 'user' || m.role === 'bot')
+      .slice(-8)
+      .map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content }));
+
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
 
     try {
-      const API_URL =
-        process.env.NODE_ENV === 'development'
-          ? 'http://localhost:8001/chat'
-          : 'https://shaurya-chat-endpoint.onrender.com/chat';
-
-      const response = await axios.post(API_URL, {
-        message: userMsg.content,
+      // Netlify serverless function (free) — see netlify/functions/chat.mjs.
+      // It streams the reply back as plain text, token by token.
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg.content, history }),
       });
 
-      const botMsg = { role: 'bot', content: response.data.response };
-      setMessages(prev => [...prev, botMsg]);
+      if (!response.body) {
+        throw new Error('No response stream');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = '';
+      let started = false;
+
+      for (;;) {
+        // eslint-disable-next-line no-await-in-loop
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        acc += decoder.decode(value, { stream: true });
+
+        if (!started) {
+          // First chunk arrived: drop the cursor and add the output line.
+          started = true;
+          setLoading(false);
+          setMessages(prev => [...prev, { role: 'bot', content: acc }]);
+        } else {
+          setMessages(prev => {
+            const next = [...prev];
+            next[next.length - 1] = { role: 'bot', content: acc };
+            return next;
+          });
+        }
+      }
+
+      if (!started) {
+        setMessages(prev => [
+          ...prev,
+          { role: 'bot', content: 'Sorry, I didn\'t catch that. Please try again.' },
+        ]);
+      }
     } catch (error) {
       console.error('Chat Error:', error);
       setMessages(prev => [
@@ -345,50 +304,60 @@ const ChatSection = () => {
   };
 
   return (
-    <StyledChatSection id="chat">
-      <header>
-        <span className="ai-label">AI ASSISTANT</span>
-        <h2>Ask me anything</h2>
-      </header>
+    <Wrap id="chat">
+      <Header>
+        <span className="label">AI Assistant</span>
+        <h1>Ask about my work</h1>
+      </Header>
 
-      <ChatContainer>
-        <MessagesWindow>
-          {messages.map((msg, i) => (
-            <MessageBubble
-              key={i}
-              messageType={msg.role}
-              style={msg.isGreeting ? { opacity: 0.8 } : {}}
-            >
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
-            </MessageBubble>
-          ))}
+      <Terminal onClick={() => inputRef.current?.focus()}>
+        <div className="bar">
+          <span className="dots">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="title">visitor@shaurya — ~/assistant</span>
+        </div>
+
+        <div className="body">
+          {messages.map((msg, i) =>
+            msg.role === 'user' ? (
+              <div className="line user" key={i}>
+                <span className="prompt">❯</span>
+                <span className="cmd">{msg.content}</span>
+              </div>
+            ) : (
+              <div className={`line bot${msg.isGreeting ? ' greeting' : ''}`} key={i}>
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+              </div>
+            ),
+          )}
 
           {loading && (
-            <MessageBubble messageType="typing">
-              <TypingDot delay="0s" />
-              <TypingDot delay="0.2s" />
-              <TypingDot delay="0.4s" />
-            </MessageBubble>
+            <div className="line bot">
+              <span className="cursor" />
+            </div>
           )}
 
           <div ref={messagesEndRef} />
-        </MessagesWindow>
+        </div>
 
-        <InputArea onSubmit={handleSend}>
+        <form className="input" onSubmit={handleSend}>
+          <span className="prompt">❯</span>
           <input
+            ref={inputRef}
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Ask anything..."
+            placeholder="type a question…"
+            aria-label="Ask the assistant"
+            autoComplete="off"
+            spellCheck="false"
           />
-          <SendButton type="submit" disabled={loading} aria-label="Send Message">
-            <svg viewBox="0 0 24 24">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-            </svg>
-          </SendButton>
-        </InputArea>
-      </ChatContainer>
-    </StyledChatSection>
+        </form>
+      </Terminal>
+    </Wrap>
   );
 };
 

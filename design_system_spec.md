@@ -1,44 +1,50 @@
-# Design System Specification
+# Design System Specification — "Ink on Paper"
 
 This document defines the compulsory color scheme, typography, and core global styles for the application. Any new frontend development **MUST** strictly adhere to these specifications to maintain visual consistency.
 
+The identity is **plain, minimal, monochrome**: black ink on white paper, hairline rules instead of shadows, system fonts, compact spacing, and almost no animation. Information density and readability come first; decoration is removed, not restyled.
+
 ## 1. Color Scheme
 
-### Primary Backgrounds
+The entire palette is grayscale. There is **no accent color** — emphasis is achieved with contrast (black), weight, and underlines.
 
-| Variable          | Hex                    | Description                                                                   |
-| :---------------- | :--------------------- | :---------------------------------------------------------------------------- |
-| `--navy`          | `#0a192f`              | **Main Background Color**. Used for the `body` and primary containers.        |
-| `--light-navy`    | `#112240`              | Lighter background for cards, headers, or secondary sections.                 |
-| `--lightest-navy` | `#233554`              | Even lighter background, often used for hover states or tertiary backgrounds. |
-| `--dark-navy`     | `#020c1b`              | Deep background, can be used for footers or high-contrast areas.              |
-| `--navy-shadow`   | `rgba(2, 12, 27, 0.7)` | Shadow color for depth.                                                       |
+### Semantic Tokens (use these in new code)
 
-### Text & Content
+| Variable           | Hex       | Description                                           |
+| :----------------- | :-------- | :---------------------------------------------------- |
+| `--bg`             | `#ffffff` | **Main background.** The page is white, always.       |
+| `--surface`        | `#f6f6f6` | Subtle surface for code blocks, chips, table stripes. |
+| `--line`           | `#e6e6e6` | Hairline borders and dividers (1px, never thicker).   |
+| `--text`           | `#111111` | **Headings, links, emphasis.** Near-black ink.        |
+| `--text-secondary` | `#4d4d4d` | Body text.                                            |
+| `--text-muted`     | `#8a8a8a` | Meta text: dates, labels, tech tags.                  |
+| `--accent`         | `#000000` | Interactive emphasis (hover, active). Pure black.     |
 
-| Variable           | Hex       | Description                                                              |
-| :----------------- | :-------- | :----------------------------------------------------------------------- |
-| `--slate`          | `#8892b0` | **Primary Body Text**. Used for standard paragraphs and generic content. |
-| `--light-slate`    | `#a8b2d1` | Lighter text, often used for secondary info or inactive states.          |
-| `--lightest-slate` | `#ccd6f6` | **Headings & Highlights**. Used for `h1`-`h6` and emphasized text.       |
-| `--dark-slate`     | `#495670` | Darker text, used for subtitles or lower-contrast elements.              |
-| `--white`          | `#e6f1ff` | Purest white used for extremely high contrast text or accents.           |
+### Legacy Aliases
 
-### Accents
+The old navy/green variable names are kept as aliases so existing components keep working. They map onto the grayscale palette:
 
-| Variable       | Hex                        | Description                                                                 |
-| :------------- | :------------------------- | :-------------------------------------------------------------------------- |
-| `--green`      | `#64ffda`                  | **Primary Accent**. Used for links, buttons, active states, and highlights. |
-| `--green-tint` | `rgba(100, 255, 218, 0.1)` | Tint for hover backgrounds on green interaction elements.                   |
-| `--pink`       | `#f57dff`                  | Secondary accent.                                                           |
-| `--blue`       | `#57cbff`                  | Tertiary accent.                                                            |
+| Legacy variable         | Now maps to                |
+| :---------------------- | :------------------------- |
+| `--navy`, `--dark-navy` | `#ffffff` (background)     |
+| `--light-navy`          | `#f6f6f6` (surface)        |
+| `--lightest-navy`       | `#e6e6e6` (lines)          |
+| `--lightest-slate`      | `#111111` (headings)       |
+| `--light-slate`         | `#333333`                  |
+| `--slate`               | `#4d4d4d` (body)           |
+| `--dark-slate`          | `#8a8a8a` (muted)          |
+| `--white`               | `#000000` (max contrast)   |
+| `--green`               | `#000000` (accent → black) |
+| `--green-tint`          | `rgba(0, 0, 0, 0.04)`      |
+
+**Do not introduce any new colors.** No green, no navy, no gradients, no shadows.
 
 ### Usage Rules
 
-- **Backgrounds**: Always use `--navy` as the default canvas. Use `--light-navy` to elevate card-like elements.
-- **Reading Text**: Use `--slate` for long-form text to reduce eye strain.
-- **Headings**: Use `--lightest-slate` to make titles pop against the dark background.
-- **Interactions**: All interactive elements (links, buttons) should utilize `--green` for their primary state and `--green-tint` for hover backgrounds.
+- **Backgrounds**: White everywhere. Use `--surface` only for code blocks and small chips — never for large card panels.
+- **Separation**: Use 1px `--line` borders, generous-enough whitespace, or both. Never box-shadows.
+- **Body text**: `--text-secondary` for paragraphs; `--text` for headings and strong emphasis.
+- **Interactions**: Links are `--text` with an underline (`text-decoration-color: var(--line)` at rest, `var(--text)` on hover). Buttons are 1px black outlines that invert (black background, white text) on hover. No transforms, no glows, no lift effects.
 
 ---
 
@@ -46,99 +52,83 @@ This document defines the compulsory color scheme, typography, and core global s
 
 ### Font Families
 
-| Variable      | Value                                                                                      | Description                                                                                     |
-| :------------ | :----------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
-| `--font-sans` | `'Calibre', 'Inter', 'San Francisco', 'SF Pro Text', -apple-system, system-ui, sans-serif` | **Primary UI Font**. Used for headings, body text, and general interface elements.              |
-| `--font-mono` | `'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace`                            | **Code & Data Font**. Used for code blocks, number counters in headings, and technical details. |
+| Variable      | Value                                                                                | Description                                                 |
+| :------------ | :----------------------------------------------------------------------------------- | :---------------------------------------------------------- |
+| `--font-sans` | `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif` | **Primary UI font.** System stack — no webfonts are loaded. |
+| `--font-mono` | `ui-monospace, 'SF Mono', 'Fira Code', 'Roboto Mono', Menlo, monospace`              | Meta text, section labels, tech tags, code.                 |
 
 ### Font Sizes
 
-| Variable       | Value  | Usage                             |
-| :------------- | :----- | :-------------------------------- |
-| `--fz-xxs`     | `12px` | Meta text, breadcrumbs            |
-| `--fz-xs`      | `13px` | Small labels                      |
-| `--fz-sm`      | `14px` | Secondary text, code snippets     |
-| `--fz-md`      | `16px` | **Base Body Size**                |
-| `--fz-lg`      | `18px` | Large body text, Intro paragraphs |
-| `--fz-xl`      | `20px` | Subtitles                         |
-| `--fz-xxl`     | `22px` | Section headers                   |
-| `--fz-heading` | `32px` | Main Page Titles                  |
+| Variable       | Value  | Usage                              |
+| :------------- | :----- | :--------------------------------- |
+| `--fz-xxs`     | `12px` | Fine print                         |
+| `--fz-xs`      | `13px` | Section labels, buttons, tech tags |
+| `--fz-sm`      | `14px` | Meta text, dates, code             |
+| `--fz-md`      | `16px` | **Base body size**                 |
+| `--fz-lg`      | `18px` | Intro paragraphs                   |
+| `--fz-xl`      | `20px` | Subheadings                        |
+| `--fz-xxl`     | `22px` | Page titles (secondary pages)      |
+| `--fz-heading` | `28px` | Main headings                      |
 
 ### Global Typography Rules
 
-- **Line Height**: Default is `1.3`.
-- **Headings**: `h1` through `h6` use `font-weight: 600` and `color: var(--lightest-slate)`.
-- **Links**: `text-decoration: none`. Color inherits from parent. Hover state turns `color: var(--green)`.
+- **Body**: 16px, `line-height: 1.6`, color `--text-secondary`.
+- **Headings**: `font-weight: 600`, color `--text`, `letter-spacing: -0.01em`. The hero name caps at `clamp(28px, 5vw, 44px)` — nothing on the site is larger.
+- **Section labels** (`.numbered-heading`): small uppercase mono labels — `13px`, `letter-spacing: 0.15em`, color `--text-muted`. No counters, no decorative rules.
+- **Links**: underlined with `text-underline-offset: 3px`; never color-only.
 
 ---
 
-## 3. Global Styles & UI Elements
+## 3. Layout & Spacing
 
-### Layout & Spacing
+Compact and narrow. The site is a single readable column.
 
-- **Border Radius**: `--border-radius: 4px` standard on buttons and cards.
-- **Transitions**: `--transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1)`. Use this for all hover effects to maintain the "smooth" feel.
+- **Content measure**: `section { max-width: 720px }`; `main { max-width: 800px; padding: 120px 24px }`. Wide tables (archive) may locally widen.
+- **Section rhythm**: `padding: 48px 0` (36px on mobile). No 100px+ gaps.
+- **Nav height**: `64px` (56px after scroll).
+- **Border radius**: `0` — everything is square.
+- **Transitions**: `all 0.15s ease`, color/opacity only. No movement.
 
-### Buttons & Links
+## 4. Motion
 
-- **Primary Button**: Transparent background, `--green` border, `--green` text.
-- **Hover State**: `--green-tint` background.
-- **Inline Links**: Standard text color with a `--green` hover state.
+Almost none, deliberately:
 
-### Scrollbars
+- **No loader** — the page renders immediately.
+- **No ScrollReveal** — `src/utils/sr.js` is a no-op; content is visible without scrolling tricks.
+- **No hover transforms** — hover states change color/underline/background only.
+- Mount fades (`fadeup`/`fadedown`) are opacity-only, 200ms.
 
-Custom scrollbars are enforced to match the dark theme:
+## 5. Imagery & Iconography
 
-```css
-html {
-  scrollbar-width: thin;
-  scrollbar-color: var(--dark-slate) var(--navy);
-}
-::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-track {
-  background: var(--navy);
-}
-::-webkit-scrollbar-thumb {
-  background-color: var(--dark-slate);
-  border: 3px solid var(--navy);
-  border-radius: 10px;
-}
-```
+- Photos render **grayscale at all times** (`filter: grayscale(100%)`), framed by a 1px `--line` border. No green frames, no blend modes, no hover reveals.
+- Project cover images are not shown on the home page — projects are presented as text entries.
+- Icons are minimal line icons inheriting `currentColor`. The logo is a plain text wordmark, not a graphic.
 
-### Selection Style
+## 6. UI Elements
 
-- **Background**: `--lightest-navy`
-- **Text Color**: `--lightest-slate`
+- **Buttons**: transparent background, `1px solid var(--text)` border, black text, mono font, square corners. Hover: solid black background, white text.
+- **Tables**: hairline row separators (`border-bottom: 1px solid var(--line)`), no zebra panels, generous-but-tight cell padding.
+- **Scrollbar**: thin, `--line` thumb on white.
+- **Selection**: black background, white text.
 
 ---
 
-## 4. Implementation Snippets
+## 7. CSS Variables Root
 
-### CSS Variables Root
-
-Copy this into your CSS variables definition file:
+The canonical definition lives in `src/styles/variables.js`. Summary:
 
 ```css
 :root {
-  --dark-navy: #020c1b;
-  --navy: #0a192f;
-  --light-navy: #112240;
-  --lightest-navy: #233554;
-  --navy-shadow: rgba(2, 12, 27, 0.7);
-  --dark-slate: #495670;
-  --slate: #8892b0;
-  --light-slate: #a8b2d1;
-  --lightest-slate: #ccd6f6;
-  --white: #e6f1ff;
-  --green: #64ffda;
-  --green-tint: rgba(100, 255, 218, 0.1);
-  --pink: #f57dff;
-  --blue: #57cbff;
+  --bg: #ffffff;
+  --surface: #f6f6f6;
+  --line: #e6e6e6;
+  --text: #111111;
+  --text-secondary: #4d4d4d;
+  --text-muted: #8a8a8a;
+  --accent: #000000;
 
-  --font-sans: 'Calibre', 'Inter', 'San Francisco', 'SF Pro Text', -apple-system, system-ui, sans-serif;
-  --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Fira Code', 'Roboto Mono', Menlo, monospace;
 
   --fz-xxs: 12px;
   --fz-xs: 13px;
@@ -147,9 +137,10 @@ Copy this into your CSS variables definition file:
   --fz-lg: 18px;
   --fz-xl: 20px;
   --fz-xxl: 22px;
-  --fz-heading: 32px;
+  --fz-heading: 28px;
 
-  --border-radius: 4px;
-  --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+  --border-radius: 0px;
+  --nav-height: 64px;
+  --transition: all 0.15s ease;
 }
 ```

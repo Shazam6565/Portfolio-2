@@ -1,7 +1,7 @@
 ---
 date: '2022-08-01'
 title: 'Graduate Research Assistant'
-company: 'D.S.C at F.S.U'
+company: 'Department of Scientific Computing, FSU'
 location: 'Tallahassee, FL'
 range: 'August 2022 - April 2023'
 url: 'https://www.sc.fsu.edu/'

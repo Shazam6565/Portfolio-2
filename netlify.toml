@@ -2,5 +2,15 @@
   publish = "public"
   command = "npm run build"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [context.production.environment]
   NODE_VERSION = "22.2.0"
+
+# Friendly alias for the chat function.
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
+  status = 200

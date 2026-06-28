@@ -1,20 +1,34 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { graphql } from 'gatsby';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
-import { srConfig } from '@config';
-import sr from '@utils/sr';
 import { Layout } from '@components';
 import { Icon } from '@components/icons';
-import { usePrefersReducedMotion } from '@hooks';
+
+const StyledHeader = styled.header`
+  .page-label {
+    margin: 0 0 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: var(--fz-heading);
+  }
+
+  .subtitle {
+    margin: 0;
+  }
+`;
 
 const StyledTableContainer = styled.div`
-  margin: 100px -20px;
-
-  @media (max-width: 768px) {
-    margin: 50px -10px;
-  }
+  margin: 40px 0 0;
 
   table {
     width: 100%;
@@ -26,80 +40,69 @@ const StyledTableContainer = styled.div`
       }
     }
 
-    tbody tr {
-      &:hover,
-      &:focus {
-        background-color: var(--light-navy);
-      }
+    th {
+      padding: 8px 10px;
+      text-align: left;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: var(--fz-xs);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--line);
     }
 
-    th,
     td {
       padding: 10px;
       text-align: left;
-
-      &:first-child {
-        padding-left: 20px;
-
-        @media (max-width: 768px) {
-          padding-left: 10px;
-        }
-      }
-      &:last-child {
-        padding-right: 20px;
-
-        @media (max-width: 768px) {
-          padding-right: 10px;
-        }
-      }
-
-      svg {
-        width: 20px;
-        height: 20px;
-      }
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
     }
 
-    tr {
-      cursor: default;
+    th:first-child,
+    td:first-child {
+      padding-left: 0;
+    }
 
-      td:first-child {
-        border-top-left-radius: var(--border-radius);
-        border-bottom-left-radius: var(--border-radius);
-      }
-      td:last-child {
-        border-top-right-radius: var(--border-radius);
-        border-bottom-right-radius: var(--border-radius);
+    th:last-child,
+    td:last-child {
+      padding-right: 0;
+    }
+
+    tbody tr {
+      &:hover,
+      &:focus-within {
+        background-color: var(--surface);
       }
     }
 
     td {
       &.year {
-        padding-right: 20px;
-
-        @media (max-width: 768px) {
-          padding-right: 10px;
-          font-size: var(--fz-sm);
-        }
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--fz-sm);
+        white-space: nowrap;
       }
 
       &.title {
-        padding-top: 15px;
-        padding-right: 20px;
-        color: var(--lightest-slate);
-        font-size: var(--fz-xl);
+        color: var(--text);
+        font-size: var(--fz-md);
         font-weight: 600;
-        line-height: 1.25;
+        line-height: 1.4;
       }
 
       &.company {
-        font-size: var(--fz-lg);
+        color: var(--text-secondary);
+        font-size: var(--fz-sm);
         white-space: nowrap;
       }
 
       &.tech {
-        font-size: var(--fz-xxs);
+        color: var(--text-muted);
         font-family: var(--font-mono);
+        font-size: var(--fz-xs);
         line-height: 1.5;
+
         .separator {
           margin: 0 5px;
         }
@@ -109,20 +112,32 @@ const StyledTableContainer = styled.div`
       }
 
       &.links {
-        min-width: 100px;
+        min-width: 80px;
 
         div {
           display: flex;
           align-items: center;
+        }
 
-          a {
-            ${({ theme }) => theme.mixins.flexCenter};
-            flex-shrink: 0;
-          }
+        a {
+          display: flex;
+          align-items: center;
+          flex-shrink: 0;
+          color: var(--text-secondary);
 
-          a + a {
-            margin-left: 10px;
+          &:hover,
+          &:focus {
+            color: var(--text);
           }
+        }
+
+        a + a {
+          margin-left: 10px;
+        }
+
+        svg {
+          width: 18px;
+          height: 18px;
         }
       }
     }
@@ -131,32 +146,19 @@ const StyledTableContainer = styled.div`
 
 const ArchivePage = ({ location, data }) => {
   const projects = data.allMarkdownRemark.edges;
-  const revealTitle = useRef(null);
-  const revealTable = useRef(null);
-  const revealProjects = useRef([]);
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      return;
-    }
-
-    sr.reveal(revealTitle.current, srConfig());
-    sr.reveal(revealTable.current, srConfig(200, 0));
-    revealProjects.current.forEach((ref, i) => sr.reveal(ref, srConfig(i * 10)));
-  }, []);
 
   return (
     <Layout location={location}>
       <Helmet title="Archive" />
 
       <main>
-        <header ref={revealTitle}>
-          <h1 className="big-heading">Archive</h1>
+        <StyledHeader>
+          <p className="page-label">Archive</p>
+          <h1>All Projects</h1>
           <p className="subtitle">A list of things I’ve worked on</p>
-        </header>
+        </StyledHeader>
 
-        <StyledTableContainer ref={revealTable}>
+        <StyledTableContainer>
           <table>
             <thead>
               <tr>
@@ -170,19 +172,10 @@ const ArchivePage = ({ location, data }) => {
             <tbody>
               {projects.length > 0 &&
                 projects.map(({ node }, i) => {
-                  const {
-                    date,
-                    github,
-                    external,
-                    // ios,
-                    // android,
-                    title,
-                    tech,
-                    company,
-                  } = node.frontmatter;
+                  const { date, github, external, title, tech, company } = node.frontmatter;
                   return (
-                    <tr key={i} ref={el => (revealProjects.current[i] = el)}>
-                      <td className="overline year">{`${new Date(date).getFullYear()}`}</td>
+                    <tr key={i}>
+                      <td className="year">{`${new Date(date).getFullYear()}`}</td>
 
                       <td className="title">{title}</td>
 
@@ -195,7 +188,6 @@ const ArchivePage = ({ location, data }) => {
                           tech.map((item, i) => (
                             <span key={i}>
                               {item}
-                              {''}
                               {i !== tech.length - 1 && <span className="separator">&middot;</span>}
                             </span>
                           ))}
@@ -213,16 +205,6 @@ const ArchivePage = ({ location, data }) => {
                               <Icon name="GitHub" />
                             </a>
                           )}
-                          {/* {ios && (
-                            <a href={ios} aria-label="Apple App Store Link">
-                              <Icon name="AppStore" />
-                            </a>
-                          )}
-                          {android && (
-                            <a href={android} aria-label="Google Play Store Link">
-                              <Icon name="PlayStore" />
-                            </a>
-                          )} */}
                         </div>
                       </td>
                     </tr>

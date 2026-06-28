@@ -7,24 +7,33 @@ import styled from 'styled-components';
 import { Layout } from '@components';
 
 const StyledTagsContainer = styled.main`
-  max-width: 1000px;
-
   h1 {
-    margin-bottom: 50px;
+    margin-bottom: 30px;
+    font-size: var(--fz-heading);
   }
+
   ul {
-    color: var(--light-slate);
+    ${({ theme }) => theme.mixins.resetList};
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
 
     li {
-      font-size: var(--fz-xxl);
+      font-size: var(--fz-md);
 
       a {
-        color: var(--light-slate);
+        color: var(--text);
+
+        &:hover,
+        &:focus {
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
 
         .count {
-          color: var(--slate);
+          color: var(--text-muted);
           font-family: var(--font-mono);
-          font-size: var(--fz-md);
+          font-size: var(--fz-sm);
         }
       }
     }
@@ -47,10 +56,10 @@ const TagsPage = ({
       </span>
 
       <h1>Tags</h1>
-      <ul className="fancy-list">
+      <ul>
         {group.map(tag => (
           <li key={tag.fieldValue}>
-            <Link to={`/pensieve/tags/${kebabCase(tag.fieldValue)}/`} className="inline-link">
+            <Link to={`/pensieve/tags/${kebabCase(tag.fieldValue)}/`}>
               {tag.fieldValue} <span className="count">({tag.totalCount})</span>
             </Link>
           </li>

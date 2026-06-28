@@ -6,36 +6,66 @@ import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { Layout } from '@components';
 
-const StyledTagsContainer = styled.main`
-  max-width: 1000px;
-
-  a {
-    ${({ theme }) => theme.mixins.inlineLink};
-  }
-
+const StyledTagContainer = styled.main`
   h1 {
-    ${({ theme }) => theme.mixins.flexBetween};
-    margin-bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 30px;
+    font-size: var(--fz-heading);
 
-    a {
-      font-size: var(--fz-lg);
+    .all-tags-link {
+      ${({ theme }) => theme.mixins.inlineLink};
+      font-family: var(--font-mono);
+      font-size: var(--fz-xs);
       font-weight: 400;
     }
   }
 
   ul {
+    ${({ theme }) => theme.mixins.resetList};
+
     li {
-      font-size: 24px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+
+      &:first-child {
+        padding-top: 0;
+      }
+
       h2 {
-        font-size: inherit;
-        margin: 0;
+        margin: 0 0 4px;
+        font-size: var(--fz-lg);
+        font-weight: 600;
+        line-height: 1.3;
+
         a {
-          color: var(--light-slate);
+          color: var(--text);
+
+          &:hover,
+          &:focus {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+          }
         }
       }
-      .subtitle {
-        color: var(--slate);
-        font-size: var(--fz-sm);
+
+      .meta {
+        margin: 0;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--fz-xs);
+
+        a {
+          color: var(--text-muted);
+
+          &:hover,
+          &:focus {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+          }
+        }
 
         .tag {
           margin-right: 10px;
@@ -53,7 +83,7 @@ const TagTemplate = ({ pageContext, data, location }) => {
     <Layout location={location}>
       <Helmet title={`Tagged: #${tag}`} />
 
-      <StyledTagsContainer>
+      <StyledTagContainer>
         <span className="breadcrumb">
           <span className="arrow">&larr;</span>
           <Link to="/pensieve">All memories</Link>
@@ -62,11 +92,13 @@ const TagTemplate = ({ pageContext, data, location }) => {
         <h1>
           <span>#{tag}</span>
           <span>
-            <Link to="/pensieve/tags">View all tags</Link>
+            <Link to="/pensieve/tags" className="all-tags-link">
+              View all tags
+            </Link>
           </span>
         </h1>
 
-        <ul className="fancy-list">
+        <ul>
           {edges.map(({ node }) => {
             const { title, slug, date, tags } = node.frontmatter;
             return (
@@ -74,7 +106,7 @@ const TagTemplate = ({ pageContext, data, location }) => {
                 <h2>
                   <Link to={slug}>{title}</Link>
                 </h2>
-                <p className="subtitle">
+                <p className="meta">
                   <time>
                     {new Date(date).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -95,7 +127,7 @@ const TagTemplate = ({ pageContext, data, location }) => {
             );
           })}
         </ul>
-      </StyledTagsContainer>
+      </StyledTagContainer>
     </Layout>
   );
 };
@@ -124,7 +156,7 @@ TagTemplate.propTypes = {
 };
 
 export const pageQuery = graphql`
-  query($tag: String!) {
+  query ($tag: String!) {
     allMarkdownRemark(
       limit: 2000
       sort: { fields: [frontmatter___date], order: DESC }

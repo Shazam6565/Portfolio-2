@@ -1,35 +1,37 @@
 import { css } from 'styled-components';
 
+// Grayscale-only code theme — "ink on paper". No accent colors.
 const prismColors = {
-  bg: `#112340`,
-  lineHighlight: `#1d2d50`,
-  blue: `#5ccfe6`,
-  purple: `#c3a6ff`,
-  green: `#bae67e`,
-  yellow: `#ffd580`,
-  orange: `#ffae57`,
-  red: `#ef6b73`,
-  grey: `#a2aabc`,
-  comment: `#8695b799`,
+  bg: `var(--surface)`,
+  bgRaised: `#efefef`,
+  line: `var(--line)`,
+  text: `var(--text-secondary)`,
+  ink: `#111111`,
+  string: `#555555`,
+  number: `#333333`,
+  punctuation: `#8a8a8a`,
+  comment: `#9a9a9a`,
+  muted: `var(--text-muted)`,
 };
 
 // https://www.gatsbyjs.org/packages/gatsby-remark-prismjs
 
 const PrismStyles = css`
   /**
-  * Add back the container background-color, border-radius, padding, margin
+  * Add back the container background-color, border, padding, margin
   * and overflow that we removed from <pre>.
   */
   .gatsby-highlight {
     background-color: ${prismColors.bg};
-    color: ${prismColors.grey};
-    border-radius: var(--border-radius);
+    color: ${prismColors.text};
+    border: 1px solid ${prismColors.line};
+    border-radius: 0;
     margin: 2em 0;
     padding: 1.25em;
     overflow: auto;
     position: relative;
     font-family: var(--font-mono);
-    font-size: var(--fz-md);
+    font-size: var(--fz-sm);
   }
 
   .gatsby-highlight code[class*='language-'],
@@ -43,6 +45,16 @@ const PrismStyles = css`
     word-wrap: normal;
     tab-size: 2;
     hyphens: none;
+  }
+
+  /* Selection inside code: ink inverts */
+  .gatsby-highlight ::selection {
+    background-color: var(--text);
+    color: var(--bg);
+  }
+  .gatsby-highlight ::-moz-selection {
+    background-color: var(--text);
+    color: var(--bg);
   }
 
   /**
@@ -64,27 +76,25 @@ const PrismStyles = css`
 
   /* File names */
   .gatsby-code-title {
-    padding: 1em 1.5em;
+    padding: 0.75em 1.25em;
     font-family: var(--font-mono);
     font-size: var(--fz-xs);
-    background-color: ${prismColors.bg};
-    color: ${prismColors.grey};
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
-    border-bottom: 1px solid ${prismColors.lineHighlight};
+    background-color: ${prismColors.bgRaised};
+    color: ${prismColors.muted};
+    border: 1px solid ${prismColors.line};
+    border-radius: 0;
 
     & + .gatsby-highlight {
       margin-top: 0;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
+      border-top: none;
     }
   }
 
   /* Line highlighting */
   .gatsby-highlight-code-line {
     display: block;
-    background-color: ${prismColors.lineHighlight};
-    border-left: 2px solid var(--green);
+    background-color: ${prismColors.bgRaised};
+    border-left: 2px solid var(--text);
     padding-left: calc(1em + 2px);
     padding-right: 1em;
     margin-right: -1.35em;
@@ -93,14 +103,16 @@ const PrismStyles = css`
 
   /* Language badges */
   .gatsby-highlight pre[class*='language-']::before {
-    background: var(--lightest-navy);
-    color: var(--white);
+    background: ${prismColors.bgRaised};
+    color: ${prismColors.muted};
     font-size: var(--fz-xxs);
     font-family: var(--font-mono);
     line-height: 1.5;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    border-radius: 0 0 3px 3px;
+    border: 1px solid ${prismColors.line};
+    border-top: none;
+    border-radius: 0;
     position: absolute;
     top: 0;
     left: 1.25rem;
@@ -156,7 +168,7 @@ const PrismStyles = css`
     content: 'flow';
   }
 
-  /* Prism Styles */
+  /* Prism Styles — grayscale tokens only */
   .token {
     display: inline;
   }
@@ -166,40 +178,49 @@ const PrismStyles = css`
   .token.doctype,
   .token.cdata {
     color: ${prismColors.comment};
+    font-style: italic;
   }
   .token.punctuation {
-    color: ${prismColors.grey};
+    color: ${prismColors.punctuation};
   }
   .token.namespace,
   .token.deleted {
-    color: ${prismColors.red};
+    color: ${prismColors.string};
   }
   .token.function-name,
   .token.function,
-  .token.class-name,
+  .token.class-name {
+    color: ${prismColors.ink};
+  }
   .token.constant,
   .token.symbol {
-    color: ${prismColors.yellow};
+    color: ${prismColors.number};
   }
   .token.attr-name,
   .token.operator,
   .token.rule {
-    color: ${prismColors.orange};
+    color: ${prismColors.number};
   }
-  .token.keyword,
+  .token.keyword {
+    color: ${prismColors.ink};
+    font-weight: 600;
+  }
   .token.boolean,
   .token.number,
   .token.property {
-    color: ${prismColors.purple};
+    color: ${prismColors.number};
   }
   .token.tag,
   .token.selector,
+  .token.atrule {
+    color: ${prismColors.ink};
+    font-weight: 600;
+  }
   .token.important,
-  .token.atrule,
   .token.builtin,
   .token.entity,
   .token.url {
-    color: ${prismColors.blue};
+    color: ${prismColors.ink};
   }
   .token.string,
   .token.char,
@@ -207,7 +228,7 @@ const PrismStyles = css`
   .token.regex,
   .token.variable,
   .token.inserted {
-    color: ${prismColors.green};
+    color: ${prismColors.string};
   }
   .token.important,
   .token.bold {
