@@ -5,17 +5,31 @@
  */
 
 const path = require('path');
-const _ = require('lodash');
+
+// `videos` on physical-ai-projects entries is `[]` in every current file, so
+// Gatsby's type inference can't sample its shape. Declare it explicitly so
+// `videos { label url }` queries don't break as soon as inference guesses wrong.
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions;
+  createTypes(`
+    type MarkdownRemarkFrontmatter {
+      videos: [PhysicalAiVideoLog]
+    }
+    type PhysicalAiVideoLog {
+      label: String
+      url: String
+    }
+  `);
+};
 
 exports.createPages = async ({ actions, graphql, reporter }) => {
   const { createPage } = actions;
-  const postTemplate = path.resolve(`src/templates/post.js`);
-  const tagTemplate = path.resolve('src/templates/tag.js');
+  const researchTemplate = path.resolve('src/templates/research.js');
 
   const result = await graphql(`
     {
-      postsRemark: allMarkdownRemark(
-        filter: { fileAbsolutePath: { regex: "/content/posts/" } }
+      researchRemark: allMarkdownRemark(
+        filter: { fileAbsolutePath: { regex: "/content/research/" } }
         sort: { order: DESC, fields: [frontmatter___date] }
         limit: 1000
       ) {
@@ -27,11 +41,6 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
           }
         }
       }
-      tagsGroup: allMarkdownRemark(limit: 2000) {
-        group(field: frontmatter___tags) {
-          fieldValue
-        }
-      }
     }
   `);
 
@@ -41,27 +50,14 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     return;
   }
 
-  // Create post detail pages
-  const posts = result.data.postsRemark.edges;
+  // Create research entry detail pages
+  const researchEntries = result.data.researchRemark.edges;
 
-  posts.forEach(({ node }) => {
+  researchEntries.forEach(({ node }) => {
     createPage({
       path: node.frontmatter.slug,
-      component: postTemplate,
-      context: {},
-    });
-  });
-
-  // Extract tag data from query
-  const tags = result.data.tagsGroup.group;
-  // Make tag pages
-  tags.forEach(tag => {
-    createPage({
-      path: `/pensieve/tags/${_.kebabCase(tag.fieldValue)}/`,
-      component: tagTemplate,
-      context: {
-        tag: tag.fieldValue,
-      },
+      component: researchTemplate,
+      context: { slug: node.frontmatter.slug },
     });
   });
 };
