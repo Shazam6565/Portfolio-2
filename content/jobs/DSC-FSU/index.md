@@ -8,7 +8,5 @@ url: 'https://www.sc.fsu.edu/'
 ---
 
 - Developed advanced neural network architectures utilizing libraries PyTorch and TensorFlow for deep learning models from inception.
-- Achieved 0.92 F1-score and 0.95 AUC-ROC with deep learning model for real-time environmental anomaly classification.
-- Model robust to noise, handled multimodal inputs, and detected deviations with 0.90 precision and 0.94 recall.
-- Optimized deep learning pipeline using custom CUDA GPU kernels in C++, reducing processing time by 40% for anomaly detection.
-- Enhanced computational speed by 30% through GPU clustering and applied HPC techniques for scalable neural network training.
+- Learned to optimize deep learning pipelines using custom CUDA GPU kernels in C++ for anomaly detection.
+- Gained experience with GPU clustering and HPC techniques for scaling neural network training.

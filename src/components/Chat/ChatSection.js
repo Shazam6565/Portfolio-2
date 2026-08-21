@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import ReactMarkdown from 'react-markdown';
+import { Renderer } from '@openuidev/react-lang';
+import { library } from './genui/library';
 
 const blink = keyframes`
   0%, 49% { opacity: 1; }
@@ -118,52 +119,7 @@ const Terminal = styled.div`
     color: var(--text-muted);
   }
   .line.bot p {
-    margin: 0 0 8px;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  .line.bot ul,
-  .line.bot ol {
-    margin: 4px 0 8px;
-    padding-left: 18px;
-  }
-  .line.bot li {
-    margin-bottom: 4px;
-  }
-  .line.bot strong {
-    color: var(--text);
-    font-weight: 600;
-  }
-  .line.bot a {
-    color: var(--text);
-    text-decoration: underline;
-    text-decoration-color: var(--line);
-    text-underline-offset: 3px;
-    &:hover,
-    &:focus-visible {
-      text-decoration-color: var(--text);
-    }
-  }
-  .line.bot code {
-    font-family: var(--font-mono);
-    font-size: 0.9em;
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    padding: 0.05em 0.35em;
-  }
-  .line.bot pre {
-    margin: 0 0 8px;
-    padding: 10px 12px;
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    overflow-x: auto;
-
-    code {
-      background: transparent;
-      border: 0;
-      padding: 0;
-    }
+    margin: 0;
   }
 
   .cursor {
@@ -259,6 +215,12 @@ const ChatSection = () => {
         throw new Error('No response stream');
       }
 
+      // A non-2xx response body is a plain-English error string (see
+      // chat.mjs), not OpenUI Lang — render it as plain text, not through
+      // the generative-UI Renderer, or it will silently fail to parse and
+      // show nothing.
+      const isPlain = !response.ok;
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let acc = '';
@@ -276,27 +238,44 @@ const ChatSection = () => {
           // First chunk arrived: drop the cursor and add the output line.
           started = true;
           setLoading(false);
-          setMessages(prev => [...prev, { role: 'bot', content: acc }]);
+          setMessages(prev => [
+            ...prev,
+            { role: 'bot', content: acc, isPlain, isStreaming: !isPlain },
+          ]);
         } else {
           setMessages(prev => {
             const next = [...prev];
-            next[next.length - 1] = { role: 'bot', content: acc };
+            next[next.length - 1] = { ...next[next.length - 1], content: acc };
             return next;
           });
         }
       }
 
+      if (started) {
+        // Stream finished: freeze the last message so the renderer stops
+        // treating it as an in-progress parse.
+        setMessages(prev => {
+          const next = [...prev];
+          next[next.length - 1] = { ...next[next.length - 1], isStreaming: false };
+          return next;
+        });
+      }
+
       if (!started) {
         setMessages(prev => [
           ...prev,
-          { role: 'bot', content: 'Sorry, I didn\'t catch that. Please try again.' },
+          { role: 'bot', content: 'Sorry, I didn\'t catch that. Please try again.', isPlain: true },
         ]);
       }
     } catch (error) {
       console.error('Chat Error:', error);
       setMessages(prev => [
         ...prev,
-        { role: 'bot', content: 'Sorry, I\'m having trouble connecting to the brain right now.' },
+        {
+          role: 'bot',
+          content: 'Sorry, I\'m having trouble connecting to the brain right now.',
+          isPlain: true,
+        },
       ]);
     } finally {
       setLoading(false);
@@ -317,7 +296,7 @@ const ChatSection = () => {
             <i />
             <i />
           </span>
-          <span className="title">visitor@shaurya — ~/assistant</span>
+          <span className="title">visitor@shaurya:~/assistant</span>
         </div>
 
         <div className="body">
@@ -329,7 +308,16 @@ const ChatSection = () => {
               </div>
             ) : (
               <div className={`line bot${msg.isGreeting ? ' greeting' : ''}`} key={i}>
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                {msg.isGreeting || msg.isPlain ? (
+                  <p>{msg.content}</p>
+                ) : (
+                  <Renderer
+                    response={msg.content}
+                    library={library}
+                    isStreaming={!!msg.isStreaming}
+                    onError={console.warn}
+                  />
+                )}
               </div>
             ),
           )}

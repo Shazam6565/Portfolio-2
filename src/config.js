@@ -27,31 +27,31 @@ module.exports = {
   navLinks: [
     {
       name: 'About',
-      url: '/#about',
+      url: '/about',
+    },
+    {
+      name: 'Research',
+      url: '/research',
     },
     {
       name: 'Experience',
-      url: '/#jobs',
+      url: '/experience',
     },
     {
       name: 'Work',
-      url: '/#projects',
+      url: '/work',
     },
     {
       name: 'Archive',
       url: '/archive',
     },
     {
-      name: 'Writing',
-      url: '/pensieve',
+      name: 'Chat',
+      url: '/chat',
     },
     {
       name: 'Contact',
-      url: '/#contact',
-    },
-    {
-      name: 'AI Assistant',
-      url: '/chat',
+      url: '/contact',
     },
   ],
 

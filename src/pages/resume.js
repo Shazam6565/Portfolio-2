@@ -88,6 +88,17 @@ const StyledResumeContainer = styled.main`
         white-space: nowrap;
         margin-left: 16px;
       }
+
+      a {
+        ${({ theme }) => theme.mixins.inlineLink};
+        display: inline-flex;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-size: var(--fz-xs);
+        color: var(--text-muted);
+        white-space: nowrap;
+        margin-left: 16px;
+      }
     }
 
     .sub-row {
@@ -108,6 +119,22 @@ const StyledResumeContainer = styled.main`
         font-family: var(--font-mono);
         font-size: var(--fz-xs);
       }
+
+      a {
+        ${({ theme }) => theme.mixins.inlineLink};
+        display: inline-flex;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-size: var(--fz-xs);
+        color: var(--text-muted);
+      }
+    }
+
+    .header-row a svg,
+    .sub-row a svg {
+      width: 13px;
+      height: 13px;
+      margin-right: 4px;
     }
 
     p {
@@ -224,9 +251,10 @@ const ResumePage = ({ location }) => (
     <StyledResumeContainer>
       <header>
         <h1>Shaurya Tiwari</h1>
-        <div className="subtitle">AI Software Engineer</div>
+        <div className="subtitle">AI Software Engineer · Physical AI · OpenUSD · Simulation</div>
         <div className="contact-links">
           <a href="mailto:vaasutiwari@gmail.com">vaasutiwari@gmail.com</a>
+          <a href="tel:+18503454646">+1 (850) 345-4646</a>
           <a href="https://linkedin.com/in/shauryatiwari" target="_blank" rel="noreferrer">
             <IconLinkedin /> LinkedIn
           </a>
@@ -254,6 +282,110 @@ const ResumePage = ({ location }) => (
           csv generations, performing in ambiguous environments with strong cross-functional
           collaboration across multiple verticals.
         </p>
+        <p>
+          NVIDIA-Certified in OpenUSD, with hands-on Isaac Sim, Isaac Lab, robot policy training,
+          and simulation workflows for Physical AI.
+        </p>
+      </section>
+
+      <section>
+        <h2>Physical AI &amp; Simulation</h2>
+
+        <div className="project-item">
+          <div className="header-row">
+            <h3>NVIDIA-Certified Professional: OpenUSD Development</h3>
+            <span className="date">July 2026</span>
+          </div>
+          <div className="sub-row">
+            <a
+              href="https://www.credly.com/badges/74c2ccf3-c904-453b-98db-ef9c6d1caec8"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Verify on Credly
+            </a>
+          </div>
+        </div>
+
+        <div className="project-item">
+          <div className="header-row">
+            <h3>Force-Aware Peg Insertion</h3>
+          </div>
+          <div className="sub-row">
+            <span className="position">Isaac Lab, Isaac Sim, PPO, PhysX</span>
+            <a
+              href="https://github.com/Shazam6565/Policy-RL-Peg_insertion"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <IconGitHub /> GitHub
+            </a>
+          </div>
+          <ul>
+            <li>
+              Benchmarked four PPO policy variants across three seeds to evaluate whether force
+              feedback improves Franka peg-insertion robustness under nominal and randomized
+              conditions.
+            </li>
+            <li>
+              Designed controlled reward/observation ablations with TensorBoard-logged metrics
+              against a reproduced geometry-only baseline.
+            </li>
+          </ul>
+        </div>
+
+        <div className="project-item">
+          <div className="header-row">
+            <h3>GPU-Parallel Robot Policy Training</h3>
+          </div>
+          <div className="sub-row">
+            <span className="position">Isaac Lab, Isaac Sim, PhysX, ovphysx, Python</span>
+            <a
+              href="https://github.com/Shazam6565/Policy-RL-Peg_insertion"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <IconGitHub /> GitHub
+            </a>
+          </div>
+          <ul>
+            <li>
+              Built GPU-parallel reinforcement-learning workflows in Isaac Lab, running large-scale
+              PhysX simulations for robot policy training.
+            </li>
+            <li>
+              Configured vectorized environments, observations, actions, rewards, and domain
+              randomization for high-throughput policy training and evaluation.
+            </li>
+          </ul>
+        </div>
+
+        <div className="project-item">
+          <div className="header-row">
+            <h3>Digital-Twin &amp; Robotics Asset Pipeline</h3>
+          </div>
+          <div className="sub-row">
+            <span className="position">Omniverse, OpenUSD, ovrtx, ovphysx, Isaac Sim</span>
+            <a
+              href="https://github.com/Shazam6565/isaac-sim-workspace"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <IconGitHub /> GitHub
+            </a>
+          </div>
+          <ul>
+            <li>
+              Assembled and optimized SimReady OpenUSD digital twins and robotics assets using
+              composition, instancing, materials, URDF interoperability, validation, and
+              scene-optimization workflows.
+            </li>
+            <li>
+              Structured USD environments for modular ovrtx rendering/sensor simulation and ovphysx
+              physics workflows across NVIDIA Physical AI applications.
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section>
@@ -282,6 +414,11 @@ const ResumePage = ({ location }) => (
             </li>
             <li>
               Build guardrails and conditional routing for production-safe agentic tool execution
+            </li>
+            <li>
+              Partnered with stakeholders across 12 business verticals to convert ambiguous domain
+              problems into validated AI roadmaps, implementation plans, and production-ready
+              engineering scopes
             </li>
           </ul>
         </div>
@@ -323,6 +460,10 @@ const ResumePage = ({ location }) => (
             <li>
               Reduced inference time 40% via custom CUDA kernels; boosted throughput 30% with GPU
               clustering
+            </li>
+            <li>
+              Built and trained deep learning models in PyTorch, including GAN-based experiments and
+              reinforcement learning concepts for synthetic climate-state data generation
             </li>
           </ul>
         </div>
@@ -403,6 +544,78 @@ const ResumePage = ({ location }) => (
           </div>
           <p>Polyp detection model (PyTorch/OpenCV) achieving 0.92 DSC, 0.86 JC.</p>
         </div>
+        <div className="project-item">
+          <div className="header-row">
+            <h3>AutoTicket: Internal Company Hackathon (March 2026)</h3>
+          </div>
+          <p>
+            Built an automatic Jira/Confluence/GitLab-integrated triaging system on ByteSage&apos;s
+            agent orchestration, generating tickets and boilerplate code from intake forms and
+            saving up to 3 weeks of project initiation time.
+          </p>
+        </div>
+        <div className="project-item">
+          <div className="header-row">
+            <h3>POView: Cerebral Valley Hackathon (March 2026)</h3>
+          </div>
+          <p>
+            Built a 3D geospatial globe interface with the Google Places API and Gemini Live API,
+            letting users navigate to referenced locations through conversational AI.
+          </p>
+        </div>
+        <div className="project-item">
+          <div className="header-row">
+            <h3>InstruX (Feb 2026 – Present)</h3>
+            <a href="https://instrux.world/" target="_blank" rel="noreferrer">
+              <IconExternal /> instrux.world
+            </a>
+          </div>
+          <p>
+            Open source project. Designed a reference architecture for an agentic
+            robotics-evaluation layer connecting simulation, synthetic scenario generation, and
+            policy-readiness assessment.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>NVIDIA Applied Work</h2>
+
+        <div className="experience-item">
+          <div className="header-row">
+            <h3>Technical Communication</h3>
+          </div>
+          <ul>
+            <li>
+              100+ livestreams hosted on OpenUSD, Isaac Sim, Isaac Lab, and Physical AI concepts,
+              all logged on YouTube Live with code, notes, and references
+            </li>
+          </ul>
+        </div>
+
+        <div className="experience-item">
+          <div className="header-row">
+            <h3>SIGGRAPH 2026: NVIDIA Physical AI Hands-On Labs</h3>
+          </div>
+          <ul>
+            <li>
+              Blender, Oranges, and ovrtx: integrated ovrtx, ovphysx, and ovstage with Blender to
+              build an RTX-rendered, physics-enabled OpenUSD workflow using composable NVIDIA
+              Omniverse Libraries
+            </li>
+            <li>
+              Ray Trace Your Way With Omniverse Libraries: built an OpenUSD-based RTX viewport with
+              Omniverse Libraries, loading and querying USD scenes, rendering RTX output,
+              controlling cameras, and generating image results
+            </li>
+            <li>
+              Advancing World Simulation With 3D Gaussian Splatting: built a real-world-to-
+              simulation reconstruction workflow using NVIDIA fVDB and Omniverse NuRec, applying
+              multi-GPU 3D Gaussian Splatting, segmentation, and object-level integration to create
+              simulation-ready environments for Isaac Sim / Isaac Lab
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section>
@@ -427,6 +640,7 @@ const ResumePage = ({ location }) => (
               <li>TensorFlow</li>
               <li>RAG</li>
               <li>Vector Store</li>
+              <li>PPO</li>
             </ul>
           </div>
           <div className="skill-category">
@@ -448,6 +662,18 @@ const ResumePage = ({ location }) => (
               <li>New Relic</li>
               <li>Snyk</li>
               <li>CloudWatch</li>
+            </ul>
+          </div>
+          <div className="skill-category">
+            <h4>Physical AI / Simulation</h4>
+            <ul>
+              <li>OpenUSD</li>
+              <li>Isaac Sim</li>
+              <li>Isaac Lab</li>
+              <li>PhysX</li>
+              <li>ovrtx</li>
+              <li>ovphysx</li>
+              <li>ovstage</li>
             </ul>
           </div>
         </div>

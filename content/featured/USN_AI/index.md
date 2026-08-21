@@ -1,5 +1,5 @@
 ---
-date: '1'
+date: '6'
 title: 'Academic Insights AI Assistant'
 cover: './aiimage.png'
 github: 'https://www.law.cornell.edu/wex/non-disclosure_agreement_(nda)'

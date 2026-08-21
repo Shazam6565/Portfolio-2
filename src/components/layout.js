@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'gatsby';
 import styled, { ThemeProvider } from 'styled-components';
-import { Head, Footer, ThemeToggle } from '@components';
+import { Head, Footer, Nav, ThemeToggle } from '@components';
 import { GlobalStyle, theme } from '@styles';
 
 const StyledContent = styled.div`
@@ -18,9 +18,13 @@ const StyledChrome = styled.div`
   right: 0;
   z-index: 20;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 8px 24px;
   padding: 18px 22px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
   pointer-events: none;
 
   & > * {
@@ -28,6 +32,7 @@ const StyledChrome = styled.div`
   }
 
   .home-link {
+    flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: var(--fz-xs);
     letter-spacing: 0.04em;
@@ -41,7 +46,13 @@ const StyledChrome = styled.div`
     }
   }
 
+  nav {
+    flex: 1;
+    justify-content: center;
+  }
+
   .chrome-right {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: 18px;
@@ -61,15 +72,9 @@ const StyledChrome = styled.div`
       text-underline-offset: 3px;
     }
   }
-
-  .spacer {
-    width: 1px;
-  }
 `;
 
 const Layout = ({ children, location }) => {
-  const isHome = location.pathname === '/';
-
   // Sets target="_blank" rel="noopener noreferrer" on external links
   const handleExternalLinks = () => {
     const allLinks = Array.from(document.querySelectorAll('a'));
@@ -111,13 +116,10 @@ const Layout = ({ children, location }) => {
           </a>
 
           <StyledChrome>
-            {isHome ? (
-              <span className="spacer" />
-            ) : (
-              <Link className="home-link" to="/">
-                ← shaurya tiwari
-              </Link>
-            )}
+            <Link className="home-link" to="/">
+              ← shaurya tiwari
+            </Link>
+            <Nav location={location} />
             <div className="chrome-right">
               <Link className="resume-link" to="/resume">
                 Résumé
@@ -126,19 +128,12 @@ const Layout = ({ children, location }) => {
             </div>
           </StyledChrome>
 
-          {isHome ? (
-            <main id="content">
+          <StyledContent>
+            <div id="content">
               {children}
               <Footer />
-            </main>
-          ) : (
-            <StyledContent>
-              <div id="content">
-                {children}
-                <Footer />
-              </div>
-            </StyledContent>
-          )}
+            </div>
+          </StyledContent>
         </ThemeProvider>
       </div>
     </>

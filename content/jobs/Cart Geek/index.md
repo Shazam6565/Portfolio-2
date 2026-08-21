@@ -7,6 +7,5 @@ range: 'June 2020 - December 2020'
 url: 'https://cart-geek.com'
 ---
 
-- Deployed and managed Microsoft Azure based hosting with .NET applications using App Services and Traffic Manager for optimization.
-- Leveraged ASP.NET Core for building and deploying scalable web applications and APIs, ensuring high availability and performance.
-- Utilized Google Cloud Platform: Compute Engine and Cloud Storage, to host dynamic web applications and manage data sets securely
+- Developed and maintained web applications using JavaScript, PHP and content management systems (CMS) like Joomla and WordPress, enhancing functionality and user experience.
+- Technical Documentation: Created comprehensive documentation for deployed applications and cloud infrastructure, facilitating smooth handovers and maintenance for future teams.

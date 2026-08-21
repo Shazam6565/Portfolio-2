@@ -1,5 +1,5 @@
 ---
-date: '1'
+date: '7'
 title: 'Personalized Portfolio AI Assistant'
 cover: './rag.png'
 github: 'https://github.com/Shazam6565/'

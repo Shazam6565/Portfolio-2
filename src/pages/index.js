@@ -1,10 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Layout, GraphHome } from '@components';
+import { Layout, Hero, Evidence, Direction } from '@components';
 
 const IndexPage = ({ location }) => (
   <Layout location={location}>
-    <GraphHome />
+    <main>
+      <Hero />
+      <Evidence />
+      <Direction />
+    </main>
   </Layout>
 );
 
