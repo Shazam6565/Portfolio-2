@@ -154,7 +154,48 @@ const Terminal = styled.div`
       color: var(--text-muted);
     }
   }
+
+  .send {
+    flex: none;
+    ${({ theme }) => theme.mixins.flexCenter};
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--text);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition);
+
+    svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    &:disabled {
+      border-color: var(--line);
+      color: var(--text-muted);
+      cursor: default;
+    }
+  }
 `;
+
+const SendIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 19V5M5 12l7-7 7 7" />
+  </svg>
+);
 
 const ChatSection = () => {
   const [messages, setMessages] = useState([
@@ -343,6 +384,14 @@ const ChatSection = () => {
             autoComplete="off"
             spellCheck="false"
           />
+          <button
+            type="submit"
+            className="send"
+            disabled={!input.trim() || loading}
+            aria-label="Send message"
+          >
+            <SendIcon />
+          </button>
         </form>
       </Terminal>
     </Wrap>
