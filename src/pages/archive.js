@@ -144,8 +144,21 @@ const StyledTableContainer = styled.div`
   }
 `;
 
+// Frontmatter dates use mixed, non-ISO formats ('2026-' for an ongoing
+// project, 'November 2025', etc). Chrome/Node's Date parser is lenient
+// enough to handle these, but Safari's is not and returns Invalid Date,
+// so pull the year out directly instead of relying on Date parsing.
+const getYear = date => Number(date?.match(/\d{4}/)?.[0]);
+
 const ArchivePage = ({ location, data }) => {
-  const projects = data.allMarkdownRemark.edges;
+  // Sorted here (not via the GraphQL query) because the same mixed date
+  // formats make Gatsby infer frontmatter.date as a plain string field,
+  // so the query's DESC sort is alphabetical rather than chronological.
+  const projects = [...data.allMarkdownRemark.edges].sort((a, b) => {
+    const yearA = getYear(a.node.frontmatter.date);
+    const yearB = getYear(b.node.frontmatter.date);
+    return (Number.isNaN(yearB) ? 0 : yearB) - (Number.isNaN(yearA) ? 0 : yearA);
+  });
 
   return (
     <Layout location={location}>
@@ -173,9 +186,10 @@ const ArchivePage = ({ location, data }) => {
               {projects.length > 0 &&
                 projects.map(({ node }, i) => {
                   const { date, github, external, title, tech, company } = node.frontmatter;
+                  const year = getYear(date);
                   return (
                     <tr key={i}>
-                      <td className="year">{`${new Date(date).getFullYear()}`}</td>
+                      <td className="year">{Number.isNaN(year) ? '—' : year}</td>
 
                       <td className="title">{title}</td>
 
