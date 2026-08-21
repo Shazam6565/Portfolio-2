@@ -112,8 +112,16 @@ const GlobalStyle = createGlobalStyle`
     min-height: 100vh;
     padding: 120px 24px;
 
+    /* Matches the tabletL breakpoint where the fixed chrome bar forces
+       its resume/theme row onto a second line (see layout.js) and grows
+       taller than the desktop single-row bar — extra top padding keeps
+       page headings from being covered by the taller bar. */
+    @media (max-width: 768px) {
+      padding-top: 140px;
+    }
+
     @media (max-width: 480px) {
-      padding: 100px 20px;
+      padding: 140px 20px;
     }
 
     &.fillHeight {

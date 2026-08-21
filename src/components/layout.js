@@ -72,6 +72,18 @@ const StyledChrome = styled.div`
       text-underline-offset: 3px;
     }
   }
+
+  /* Below tabletL the mobile menu toggle appears and the bar no longer
+     fits on one line. Force chrome-right onto its own full-width row
+     (instead of leaving the wrap point to chance) and right-align it so
+     it sits flush under the menu toggle above it, keeping both rows
+     symmetric. */
+  @media (${({ theme }) => theme.bp.tabletL}) {
+    .chrome-right {
+      flex-basis: 100%;
+      justify-content: flex-end;
+    }
+  }
 `;
 
 const Layout = ({ children, location }) => {
