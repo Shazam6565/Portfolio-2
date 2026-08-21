@@ -1,25 +1,25 @@
 ---
 slug: '/research/lwpm'
-title: 'LWPM: <placeholder — full title TBD>'
-paper: 'LWPM'
-citation: '<placeholder — authors, venue, year>'
-paperLink: ''
+title: 'LPWM: Latent Particle World Models'
+paper: 'LPWM'
+citation: 'Daniel, Qi, Haramati, Zadeh, Li, Tamar, Pathak & Held, ICLR 2026 (Oral)'
+paperLink: 'https://arxiv.org/abs/2603.04553'
 date: '2026-08-08'
 status: 'placeholder'
 input: |
-  Placeholder — what goes into the system.
+  Placeholder: what goes into the system.
 supervisionRequired: |
-  Placeholder — how much supervision/labeling the method needs.
+  Placeholder: how much supervision/labeling the method needs.
 representationLearned: |
-  Placeholder — the representation learned.
+  Placeholder: the representation learned.
 robotActionConnection: |
-  Placeholder — how the representation connects to robot actions.
+  Placeholder: how the representation connects to robot actions.
 realHardwareTest: |
-  Placeholder — validated on real hardware, or sim-only.
+  Placeholder: validated on real hardware, or sim-only.
 limitations: |
-  Placeholder — limitations / failure modes.
+  Placeholder: limitations / failure modes.
 proposedExperiment: |
-  Placeholder — the experiment I would add.
+  Placeholder: the experiment I would add.
 githubRepo: ''
 youtubeVideo: ''
 ---

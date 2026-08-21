@@ -30,6 +30,18 @@ const StyledMainContainer = styled.main`
   }
 `;
 
+const StyledSectionHeading = styled.h2`
+  margin: 48px 0 20px;
+  padding-top: 40px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: var(--fz-xs);
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+`;
+
 const StyledResearchList = styled.ul`
   ${({ theme }) => theme.mixins.resetList};
 
@@ -74,8 +86,28 @@ const StyledResearchList = styled.ul`
   }
 `;
 
+const ResearchEntry = ({ frontmatter }) => {
+  const { title, paper, citation, slug } = frontmatter;
+
+  return (
+    <li>
+      {paper && <span className="entry__tag">{paper}</span>}
+      <h3 className="entry__title">
+        <Link to={slug}>{title}</Link>
+      </h3>
+      {citation && <p className="entry__citation">{citation}</p>}
+    </li>
+  );
+};
+
+ResearchEntry.propTypes = {
+  frontmatter: PropTypes.object.isRequired,
+};
+
 const ResearchIndexPage = ({ location, data }) => {
-  const entries = data.allMarkdownRemark.edges;
+  const entries = data.allMarkdownRemark.edges.map(({ node }) => node.frontmatter);
+  const completed = entries.filter(e => e.status !== 'placeholder');
+  const inProgress = entries.filter(e => e.status === 'placeholder');
 
   return (
     <Layout location={location}>
@@ -84,28 +116,31 @@ const ResearchIndexPage = ({ location, data }) => {
       <StyledMainContainer>
         <header>
           <p className="page-label">Research</p>
-          <h1>Paper Analysis</h1>
+          <h1>Paper Implementation with a Project</h1>
           <p className="subtitle">
-            Structured reading notes on papers relevant to Physical AI and robot learning.
+            My implementations of seminal papers, built to understand the research behind frontier
+            robotics and Physical AI.
           </p>
         </header>
 
-        <StyledResearchList>
-          {entries.length > 0 &&
-            entries.map(({ node }, i) => {
-              const { title, paper, citation, slug } = node.frontmatter;
+        {completed.length > 0 && (
+          <StyledResearchList>
+            {completed.map(frontmatter => (
+              <ResearchEntry key={frontmatter.slug} frontmatter={frontmatter} />
+            ))}
+          </StyledResearchList>
+        )}
 
-              return (
-                <li key={i}>
-                  {paper && <span className="entry__tag">{paper}</span>}
-                  <h2 className="entry__title">
-                    <Link to={slug}>{title}</Link>
-                  </h2>
-                  {citation && <p className="entry__citation">{citation}</p>}
-                </li>
-              );
-            })}
-        </StyledResearchList>
+        {inProgress.length > 0 && (
+          <>
+            <StyledSectionHeading>Work in Progress</StyledSectionHeading>
+            <StyledResearchList>
+              {inProgress.map(frontmatter => (
+                <ResearchEntry key={frontmatter.slug} frontmatter={frontmatter} />
+              ))}
+            </StyledResearchList>
+          </>
+        )}
       </StyledMainContainer>
     </Layout>
   );
@@ -131,6 +166,7 @@ export const pageQuery = graphql`
             paper
             citation
             slug
+            status
           }
         }
       }

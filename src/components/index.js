@@ -4,3 +4,6 @@ export { default as Footer } from './footer';
 export { default as ThemeToggle } from './ThemeToggle';
 export { default as Nav } from './Nav';
 export { default as ChatSection } from './Chat/ChatSection';
+export { default as Hero } from './Home/Hero';
+export { default as Evidence } from './Home/Evidence';
+export { default as Direction } from './Home/Direction';

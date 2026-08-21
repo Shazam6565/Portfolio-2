@@ -30,6 +30,10 @@ module.exports = {
       url: '/about',
     },
     {
+      name: 'Research',
+      url: '/research',
+    },
+    {
       name: 'Experience',
       url: '/experience',
     },
@@ -38,16 +42,12 @@ module.exports = {
       url: '/work',
     },
     {
-      name: 'Research',
-      url: '/research',
-    },
-    {
-      name: 'Physical AI',
-      url: '/physical-ai',
-    },
-    {
       name: 'Archive',
       url: '/archive',
+    },
+    {
+      name: 'Chat',
+      url: '/chat',
     },
     {
       name: 'Contact',

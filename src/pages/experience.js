@@ -33,30 +33,70 @@ const StyledJobList = styled.ul`
   max-width: 720px;
 
   li {
-    padding: 28px 0;
     border-bottom: 1px solid var(--line);
 
-    &:first-child {
+    &:first-child details {
       padding-top: 0;
     }
   }
 
+  details {
+    padding: 20px 0;
+  }
+
+  summary {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover .job__title,
+    &:focus-visible .job__title {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
   .job__title {
-    margin: 0 0 4px;
+    flex: 1;
+    min-width: 0;
     font-size: var(--fz-lg);
     font-weight: 600;
     line-height: 1.3;
     color: var(--text);
   }
 
-  .job__meta {
-    margin: 0 0 14px;
+  .job__range {
+    flex-shrink: 0;
     color: var(--text-muted);
     font-family: var(--font-mono);
     font-size: var(--fz-xs);
+    white-space: nowrap;
+  }
+
+  .job__toggle {
+    flex-shrink: 0;
+    width: 1em;
+    text-align: center;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+
+    &::before {
+      content: '+';
+    }
+  }
+
+  details[open] .job__toggle::before {
+    content: '\\2212';
   }
 
   .job__body {
+    margin-top: 14px;
     color: var(--text-secondary);
 
     p {
@@ -95,21 +135,24 @@ const ExperiencePage = ({ location, data }) => {
 
             return (
               <li key={i}>
-                <h2 className="job__title">
-                  {title} · {company}
-                  {current ? ' · Now' : ''}
-                </h2>
-                <p className="job__meta">
-                  {company} · {range}
-                </p>
-                <div className="job__body" dangerouslySetInnerHTML={{ __html: html }} />
-                {url && (
-                  <p className="job__link">
-                    <a href={url} target="_blank" rel="noopener noreferrer">
-                      {shortCompany(company)} &#8599;
-                    </a>
-                  </p>
-                )}
+                <details open={current}>
+                  <summary>
+                    <span className="job__title">
+                      {title} · {company}
+                      {current ? ' · Now' : ''}
+                    </span>
+                    <span className="job__range">{range}</span>
+                    <span className="job__toggle" aria-hidden="true" />
+                  </summary>
+                  <div className="job__body" dangerouslySetInnerHTML={{ __html: html }} />
+                  {url && (
+                    <p className="job__link">
+                      <a href={url} target="_blank" rel="noopener noreferrer">
+                        {shortCompany(company)} &#8599;
+                      </a>
+                    </p>
+                  )}
+                </details>
               </li>
             );
           })}

@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Layout, ChatSection } from '@components';
+import { Layout, Hero, Evidence, Direction } from '@components';
 
 const IndexPage = ({ location }) => (
   <Layout location={location}>
     <main>
-      <ChatSection />
+      <Hero />
+      <Evidence />
+      <Direction />
     </main>
   </Layout>
 );

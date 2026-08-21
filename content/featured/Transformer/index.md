@@ -1,5 +1,5 @@
 ---
-date: '2'
+date: '8'
 title: 'Transformer Text Completion Model'
 cover: './transformer.png'
 github: 'https://github.com/Shazam6565/Shazam-GPT'

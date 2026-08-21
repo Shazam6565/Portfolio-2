@@ -32,7 +32,7 @@ const ProfilePhoto = styled.div`
   width: 168px;
   border: 1px solid var(--line);
   line-height: 0;
-  margin: 0 0 24px;
+  margin: 0 auto 24px;
 
   img {
     filter: grayscale(100%);
@@ -51,6 +51,11 @@ const StyledSection = styled.section`
     margin: 0 0 16px;
     color: var(--text-secondary);
     line-height: 1.6;
+
+    strong {
+      color: var(--text);
+      font-weight: 600;
+    }
 
     a {
       ${({ theme }) => theme.mixins.inlineLink};
@@ -110,30 +115,37 @@ const AboutPage = ({ location }) => (
           />
         </ProfilePhoto>
         <p>
-          I&apos;m Shaurya Tiwari, an AI Software Engineer with a Master&apos;s in Computer Science
-          from Florida State University.
+          I&apos;m <strong>Shaurya Tiwari</strong>, an AI Software Engineer with a{' '}
+          <strong>Master&apos;s in Computer Science</strong> from{' '}
+          <strong>Florida State University</strong>.
         </p>
         <p>
-          At{' '}
-          <a href="https://www.usnews.com/" target="_blank" rel="noopener noreferrer">
-            U.S. News &amp; World Report
-          </a>{' '}
-          I build production AI infrastructure: agentic RAG systems, backend platforms, vector
-          retrieval, streaming APIs, guardrails, and observability for AI products used across
-          several business verticals.
-        </p>
-        <p>
-          My focus now is Physical AI. I&apos;m taking that same backend and systems experience into
-          simulation workflows, OpenUSD scene and data pipelines, robot-policy evaluation, and
-          closed-loop retraining, through{' '}
+          My direction is <strong>robot learning through simulation</strong>: building manipulation
+          environments, training policies, and studying how learned skills can{' '}
+          <strong>retain, transfer, and reuse</strong> across tasks, objects, and domains instead of
+          being relearned from scratch. That work runs through{' '}
           <a href="https://instrux.world/" target="_blank" rel="noopener noreferrer">
             InstruX
           </a>
-          .
+          , a decision layer I&apos;m building over Isaac Sim, Isaac Lab, and OpenUSD for the
+          robot-policy lifecycle: diagnosing failures, generating simulation scenarios, and
+          triggering retraining when deployed systems drift.
         </p>
         <p>
-          Before this I worked across data engineering, research, DevOps, and web platforms, which
-          is where I picked up the backend, ML, and infrastructure judgment I lean on today.
+          Day to day, at{' '}
+          <a href="https://www.usnews.com/" target="_blank" rel="noopener noreferrer">
+            U.S. News &amp; World Report
+          </a>{' '}
+          I build <strong>production AI infrastructure</strong> (agentic RAG systems, backend
+          platforms, vector retrieval, and streaming APIs) with the{' '}
+          <strong>guardrails and observability</strong> that keep AI products reliable across
+          several business verticals. That systems discipline is what I&apos;m now applying to
+          simulation and robot-policy evaluation.
+        </p>
+        <p>
+          Before this I worked across <strong>data engineering</strong>, <strong>research</strong>,{' '}
+          <strong>DevOps</strong>, and <strong>web platforms</strong>, which is where I picked up
+          the backend, ML, and infrastructure judgment I lean on today.
         </p>
       </StyledSection>
 

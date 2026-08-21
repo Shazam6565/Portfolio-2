@@ -172,9 +172,6 @@ const PhysicalAiIndexPage = ({ location }) => (
         <li>
           <Link to="/physical-ai/projects">Projects &rarr;</Link>
         </li>
-        <li>
-          <Link to="/physical-ai/questions">Questions to Ask &rarr;</Link>
-        </li>
       </StyledExploreList>
     </StyledContainer>
   </Layout>

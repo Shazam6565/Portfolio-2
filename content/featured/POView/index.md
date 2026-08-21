@@ -1,6 +1,6 @@
 ---
-date: '3'
-title: 'POView — Autonomous Urban Intelligence'
+date: '9'
+title: 'POView: Autonomous Urban Intelligence'
 github: 'https://github.com/Shazam6565/POView'
 external: ''
 cta: 'https://github.com/Shazam6565/POView'

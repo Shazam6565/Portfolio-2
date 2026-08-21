@@ -14,9 +14,3 @@
   from = "/api/chat"
   to = "/.netlify/functions/chat"
   status = 200
-
-# The chat UI moved to the homepage.
-[[redirects]]
-  from = "/chat"
-  to = "/"
-  status = 301
